@@ -156,6 +156,7 @@ const SignInSignUp = () => {
       return;
     }
     const result = await handleLogin(userName, password);
+    console.log("re", result);
     if (result.EC === 0 && result?.result?.accessToken) {
       showPopup(result.EM);
       localStorage.removeItem("compareList");
@@ -482,7 +483,7 @@ const SignInSignUp = () => {
                       Tôi đồng ý với
                     </span>{" "}
                     <Link
-                      to={"/terms-and-conditions"}
+                      to={"/term-of-use"}
                       className="underline text-sm"
                     >
                       chính sách và điều khoản

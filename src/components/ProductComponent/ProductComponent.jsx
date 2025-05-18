@@ -91,25 +91,25 @@ const ProductComponent = ({ item, favourites, onFavouriteChange, onClick }) => {
         className="relative w-full h-[300px] sm:h-[350px] overflow-hidden"
       >
         <img
-          src={item.product_img}
-          alt={item.product_title}
+          src={item.productImg}
+          alt={item.productTitle}
           className="w-full h-full object-cover"
         />
       </div>
       <div className="p-4">
         <h4 className="text-base font-semibold line-clamp-2 min-h-[38.4px] md:min-h-[48px] mb-3">
-          {item.product_title}
+          {item.productTitle}
         </h4>
         <div className="flex items-center justify-between mb-2">
           <span className="text-base font-bold text-[#ba2b20]">
-            {item.product_price.toLocaleString()}đ
+            {item.productPrice?.toLocaleString()}đ
           </span>
-          {item.product_percent_discount > 0 && (
+          {item.productPercentDiscount > 0 && (
             <span className="text-sm line-through text-gray-400">
               {(
-                item.product_price /
-                (1 - item.product_percent_discount / 100)
-              ).toLocaleString()}
+                item?.productPrice /
+                (1 - item?.productPercentDiscount / 100)
+              )?.toLocaleString()}
               đ
             </span>
           )}
@@ -119,9 +119,9 @@ const ProductComponent = ({ item, favourites, onFavouriteChange, onClick }) => {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center">
             {[...Array(5)].map((_, index) => {
-              const fullStars = Math.floor(item.product_rate);
+              const fullStars = Math.floor(item?.productRate);
               const isHalfStar =
-                item.product_rate % 1 !== 0 && index === fullStars;
+                item?.productRate % 1 !== 0 && index === fullStars;
 
               return isHalfStar ? (
                 <IoIosStarHalf
@@ -140,9 +140,9 @@ const ProductComponent = ({ item, favourites, onFavouriteChange, onClick }) => {
           </div>
         </div>
 
-        {item.product_percent_discount > 0 && (
+        {item?.productPercentDiscount > 0 && (
           <div className="absolute top-5 left-0 text-sm text-white font-semibold opacity-100 transition-all duration-300 bg-[#158857] p-1">
-            <span>-{item.product_percent_discount}%</span>
+            <span>-{item?.productPercentDiscount}%</span>
           </div>
         )}
 

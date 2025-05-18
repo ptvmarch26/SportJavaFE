@@ -201,6 +201,8 @@ const ProductInfoComponent = ({ product }) => {
     }
   };
 
+  console.log("pr", product);
+
   return (
     <div className="flex flex-col lg:flex-row lg:p-10 gap-10">
       <div className="w-full h-full lg:w-[500px] flex flex-col">
@@ -238,22 +240,22 @@ const ProductInfoComponent = ({ product }) => {
       {/* Phần thông tin sản phẩm */}
       <div className="w-full">
         <h1 className="text-2xl font-bold break-all">
-          {product?.product_title}
+          {product?.productTitle}
         </h1>
-        <p className="text-lg text-gray-500">{product?.product_brand}</p>
+        <p className="text-lg text-gray-500">{product?.productBrand}</p>
 
         <div className="flex items-center mt-4">
           {!selectedColor || !selectedSize ? (
             <div className="flex items-center">
               <p className="text-xl font-bold text-[#ba2b20] mr-4">
-                {product?.product_price?.toLocaleString()}₫
+                {product?.productPrice?.toLocaleString()}₫
               </p>
             </div>
           ) : (
             <p className="text-xl font-bold text-[#ba2b20] mr-4">
               {availableVariants
-                .find((v) => v.variant_size === selectedSize)
-                ?.variant_price.toLocaleString()}
+                .find((v) => v.variantSize === selectedSize)
+                ?.variantPrice.toLocaleString()}
               đ
             </p>
           )}

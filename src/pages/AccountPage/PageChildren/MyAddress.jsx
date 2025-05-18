@@ -75,7 +75,7 @@ function MyAddress() {
   }
 
   const handleSetDefault = async (index) => {
-    const updatedAddresses = addresses.map((addr, i) => ({
+    const updatedAddresses = addresses?.map((addr, i) => ({
       ...addr,
       is_default: i === index, // Đặt is_default thành true cho địa chỉ được chọn
     }));
@@ -119,7 +119,7 @@ function MyAddress() {
       </div>
       <div className="space-y-5 mt-8">
         <ul>
-          {addresses.map((address, index) => (
+          {addresses?.map((address, index) => (
             <li key={index} className="p-2 border-b py-8">
               <div className="flex flex-wrap items-center gap-5">
                 <div className="space-y-3">
