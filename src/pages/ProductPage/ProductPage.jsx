@@ -33,7 +33,6 @@ const ProductPage = () => {
         category_gender: category_gender || prev.category_gender,
         category_sub: category_sub || prev.category_sub,
       };
-      fetchProducts(newFilters);
       return newFilters;
     });
   }, [category, category_gender, category_sub]);
@@ -61,6 +60,8 @@ const ProductPage = () => {
     fetchFavourites();
   }, [token]);
 
+  // console.log("filter", selectedFilters);
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isSortOpen, setSortOpen] = useState(false);
   const [sortText, setSortText] = useState("Lọc theo");
@@ -72,7 +73,7 @@ const ProductPage = () => {
 
   useEffect(() => {
     if (currentSort) {
-      applySorting(currentSort, sortProducts);
+      applySorting(currentSort, products);
     } else {
       setSortProducts(products);
     }
@@ -86,9 +87,9 @@ const ProductPage = () => {
     const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
     if (type === "famous") {
-      setSortProducts(products.filter((p) => p.product_famous));
+      setSortProducts(products.filter((p) => p.productFamous));
     } else if (type === "selled") {
-      setSortProducts(products.filter((p) => p.product_selled >= 10));
+      setSortProducts(products.filter((p) => p.productSelled >= 10));
     } else if (type === "new") {
       setSortProducts(
         products.filter(
@@ -102,7 +103,7 @@ const ProductPage = () => {
     setCurrentSort(sortOption);
     setSortText(sortOption);
     setSortOpen(false);
-
+    setCurrentPage(1);
     applySorting(sortOption, sortProducts);
   };
 
@@ -111,10 +112,10 @@ const ProductPage = () => {
 
     switch (sortOption) {
       case "Giá: Cao đến Thấp":
-        sortedProducts.sort((a, b) => b.product_price - a.product_price);
+        sortedProducts.sort((a, b) => b.productPrice - a.productPrice);
         break;
       case "Giá: Thấp đến Cao":
-        sortedProducts.sort((a, b) => a.product_price - b.product_price);
+        sortedProducts.sort((a, b) => a.productPrice - b.productPrice);
         break;
       case "Mới nhất":
         sortedProducts.sort(
@@ -122,18 +123,24 @@ const ProductPage = () => {
         );
         break;
       case "Bán chạy":
-        sortedProducts.sort((a, b) => b.product_selled - a.product_selled);
+        sortedProducts.sort((a, b) => b.productSelled - a.productSelled);
         break;
       default:
         break;
     }
 
     setSortProducts(sortedProducts);
+    setCurrentPage(1);
   };
 
   const navigate = useNavigate();
-
   const totalPages = Math.ceil(sortProducts.length / 12);
+  useEffect(() => {
+    const totalPages = Math.ceil(sortProducts.length / 12);
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [sortProducts]);
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
@@ -234,7 +241,10 @@ const ProductPage = () => {
         onClose={() => {
           setSidebarOpen(false);
         }}
-        onFilterChange={setSelectedFilters}
+        onFilterChange={(filters) => {
+          setSelectedFilters(filters);
+          navigate("/product");
+        }}
       />
       {sortProducts.length > 0 ? (
         <div className="flex justify-center mt-10">

@@ -74,15 +74,15 @@ const ProductComponent = ({ item, favourites, onFavouriteChange, onClick }) => {
     }
     e.stopPropagation();
     setIsFavorite(!isFavorite);
-    await updateFavourite(item._id);
+    await updateFavourite(item.id);
     onFavouriteChange?.();
   };
 
   useEffect(() => {
-    if (favourites && item?._id) {
-      setIsFavorite(favourites.includes(item._id));
+    if (favourites && item?.id) {
+      setIsFavorite(favourites.includes(item.id));
     }
-  }, [favourites, item._id]);
+  }, [favourites, item.id]);
 
   return (
     <div className="relative group text-black overflow-hidden shadow-sm hover:shadow-xl transition-transform duration-300 transform cursor-pointer">

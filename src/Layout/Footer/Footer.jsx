@@ -10,7 +10,7 @@ import { getDetailStore } from "../../services/api/StoreApi";
 import { useEffect, useState } from "react";
 
 const Footer = () => {
-  const storeId = "680a5a2fe8930a6de2ee81d2";
+  const storeId = import.meta.env.VITE_STORE_ID;
   const [storeInfo, setStoreInfo] = useState({
     address: "",
     email: "",
@@ -21,11 +21,11 @@ const Footer = () => {
     const fetchStoreInfo = async () => {
       const res = await getDetailStore(storeId);
       if (res.EC === 0 && res.EM) {
-        const { store_address, store_email, store_phone } = res.EM;
+        const { storeAddress, storeEmail, storePhone } = res.result;
         setStoreInfo({
-          address: store_address || "",
-          email: store_email || "",
-          phone: store_phone || "",
+          address: storeAddress || "",
+          email: storeEmail || "",
+          phone: storePhone || "",
         });
       }
     };

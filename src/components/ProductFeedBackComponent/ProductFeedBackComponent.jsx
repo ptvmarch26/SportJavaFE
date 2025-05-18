@@ -17,16 +17,16 @@ const ProductFeedBackComponent = ({ product }) => {
 
   useEffect(() => {
     const fetchFeedbacks = async () => {
-      const data = await getAllFeedback(product._id);
+      const data = await getAllFeedback(product.id);
       if (data?.EC === 0) {
         setFeedbacks(data.result);
       }
     };
 
-    if (product?._id) {
+    if (product?.id) {
       fetchFeedbacks();
     }
-  }, [product?._id]);
+  }, [product?.id]);
 
   const indexOfLastFeedback = currentPage * feedbacksPerPage;
   const indexOfFirstFeedback = indexOfLastFeedback - feedbacksPerPage;

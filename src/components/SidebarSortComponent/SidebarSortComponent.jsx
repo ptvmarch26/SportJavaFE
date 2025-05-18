@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { Checkbox } from "@material-tailwind/react";
 import { useCategories } from "../../context/CategoriesContext";
@@ -38,7 +38,7 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
         { name: "Tím", color: "#800080" },
         { name: "Hồng", color: "#FFC0CB" },
         { name: "Nâu", color: "#8B4513" },
-        { name: "Xanh rêu", color: "#556B2F" }
+        { name: "Xanh rêu", color: "#556B2F" },
       ],
     },
     product_brand: {
@@ -83,49 +83,57 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
 
       const groupedCategories = {};
 
-      categories.forEach(cat => {
-        if (cat.category_level === 1 && !seenCategoryNames.has(cat.category_type)) {
-          seenCategoryNames.add(cat.category_type);
-          groupedCategories[cat.category_type] = {
-            name: cat.category_type,
-            ids: [cat._id],
+      categories.forEach((cat) => {
+        if (
+          cat.categoryLevel === 1 &&
+          !seenCategoryNames.has(cat.categoryType)
+        ) {
+          seenCategoryNames.add(cat.categoryType);
+          groupedCategories[cat.categoryType] = {
+            name: cat.categoryType,
+            ids: [cat.id],
           };
-        } else if (cat.category_level === 1) {
-          groupedCategories[cat.category_type].ids.push(cat._id);
+        } else if (cat.categoryLevel === 1) {
+          groupedCategories[cat.categoryType].ids.push(cat.id);
         }
       });
 
       // Danh mục cấp 1
-      const categoryOptions = Object.values(groupedCategories).map(group => ({
+      const categoryOptions = Object.values(groupedCategories).map((group) => ({
         id: group.ids,
         name: group.name,
       }));
 
       const groupedSubCategories = {};
 
-      categories.forEach(cat => {
-        if (cat.category_level === 2 && !seenSubCategoryNames.has(cat.category_type)) {
-          seenSubCategoryNames.add(cat.category_type);
-          groupedSubCategories[cat.category_type] = {
-            name: cat.category_type,
-            ids: [cat._id],
-            parentId: cat.category_parent_id,
+      categories.forEach((cat) => {
+        if (
+          cat.categoryLevel === 2 &&
+          !seenSubCategoryNames.has(cat.categoryType)
+        ) {
+          seenSubCategoryNames.add(cat.categoryType);
+          groupedSubCategories[cat.categoryType] = {
+            name: cat.categoryType,
+            ids: [cat.id],
+            parentId: cat.categoryParentId,
           };
-        } else if (cat.category_level === 2) {
-          groupedSubCategories[cat.category_type].ids.push(cat._id);
+        } else if (cat.categoryLevel === 2) {
+          groupedSubCategories[cat.categoryType].ids.push(cat.id);
         }
       });
 
-      const allCategorySubOptions = Object.values(groupedSubCategories).map(group => ({
-        id: group.ids,
-        name: group.name,
-        parentId: group.parentId,
-      }));
+      const allCategorySubOptions = Object.values(groupedSubCategories).map(
+        (group) => ({
+          id: group.ids,
+          name: group.name,
+          parentId: group.parentId,
+        })
+      );
 
       allCategorySubOptions.sort((a, b) => a.name.localeCompare(b.name));
 
       setCategorySubOptions(allCategorySubOptions);
-      setFilterOptions(prev => ({
+      setFilterOptions((prev) => ({
         ...prev,
         category: {
           ...prev.category,
@@ -136,18 +144,23 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
   }, [categories]);
 
   useEffect(() => {
-    if (selectedFilters.category?.length > 0 && categorySubOptions?.length > 0) {
+    if (
+      selectedFilters.category?.length > 0 &&
+      categorySubOptions?.length > 0
+    ) {
       const selectedCategoryIds = categories
-        ?.filter(cat => selectedFilters?.category?.includes(cat.category_type) && cat.category_level === 1)
-        ?.map(cat => cat._id);
-
+        ?.filter(
+          (cat) =>
+            selectedFilters?.category?.includes(cat.categoryType) &&
+            cat.categoryLevel === 1
+        )
+        ?.map((cat) => cat.id);
 
       const filteredSubOptions = categorySubOptions
-        ?.filter(subCat => selectedCategoryIds?.includes(subCat.parentId))
-        ?.map(subCat => subCat.name);
+        ?.filter((subCat) => selectedCategoryIds?.includes(subCat.parentId))
+        ?.map((subCat) => subCat.name);
 
-
-      setFilterOptions(prev => ({
+      setFilterOptions((prev) => ({
         ...prev,
         category_sub: {
           ...prev.category_sub,
@@ -155,16 +168,14 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
         },
       }));
 
-      setSelectedFilters(prev => ({
+      setSelectedFilters((prev) => ({
         ...prev,
-        category_sub: Array.isArray(prev?.category_sub)
-          ? prev.category_sub.filter(sub => filteredSubOptions.includes(sub))
+        category_sub: Array.isArray(prev?.categorySub)
+          ? prev.categorySub.filter((sub) => filteredSubOptions.includes(sub))
           : [],
       }));
-
     } else {
-
-      setFilterOptions(prev => ({
+      setFilterOptions((prev) => ({
         ...prev,
         category_sub: {
           ...prev.category_sub,
@@ -174,27 +185,45 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
     }
   }, [selectedFilters.category, categories, categorySubOptions]);
 
-  useEffect(() => {
-    if (onFilterChange) {
-      onFilterChange(selectedFilters);
-    }
-  }, [selectedFilters, onFilterChange]);
+  // useEffect(() => {
+  //   if (onFilterChange) {
+  //     onFilterChange(selectedFilters);
+  //   }
+  // }, [selectedFilters, onFilterChange]);
 
+  const prevFiltersRef = useRef(selectedFilters);
+
+  useEffect(() => {
+    const prevFilters = prevFiltersRef.current;
+
+    const isChanged =
+      JSON.stringify(prevFilters) !== JSON.stringify(selectedFilters);
+    if (isChanged && onFilterChange) {
+      onFilterChange(selectedFilters); 
+    }
+
+    prevFiltersRef.current = selectedFilters;
+  }, [selectedFilters]);
 
   const handleSelect = (type, value) => {
     setSelectedFilters((prev) => {
       const currentList = prev[type] || [];
       const isSelected = currentList.includes(value);
 
-      if (["category", "category_sub", "product_color", "product_brand"].includes(type)) {
+      if (
+        ["category", "category_sub", "product_color", "product_brand", "category_gender"].includes(
+          type
+        )
+      ) {
         if (type === "category" && isSelected) {
           const newCategoryList = currentList.filter((item) => item !== value);
-          const newCategorySubList = newCategoryList.length > 0
-            ? (prev.category_sub || []).filter((sub) => {
-              const firstWord = sub.split('_')[0];
-              return firstWord !== value;
-            })
-            : [];
+          const newCategorySubList =
+            newCategoryList.length > 0
+              ? (prev.categorySub || []).filter((sub) => {
+                  const firstWord = sub.split("_")[0];
+                  return firstWord !== value;
+                })
+              : [];
 
           return {
             ...prev,
@@ -218,14 +247,12 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
     });
   };
 
-
-
   const handlePriceChange = (e, type) => {
     const value = e.target.value;
 
-    setSelectedFilters(prev => ({
+    setSelectedFilters((prev) => ({
       ...prev,
-      [`price_${type}`]: value
+      [`price_${type}`]: value,
     }));
 
     if (priceCheckTimeout) {
@@ -241,7 +268,7 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
           return {
             ...prev,
             price_min: max.toString(),
-            price_max: min.toString()
+            price_max: min.toString(),
           };
         }
         return prev;
@@ -251,15 +278,19 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
     setPriceCheckTimeout(newTimeout);
   };
 
+  // console.log("category", categories);
+
   return (
     <div
-      className={`fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+      className={`fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity ${
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
       onClick={onClose}
     >
       <div
-        className={`pb-[30px] fixed left-0 top-0 h-full w-[80%] sm:w-[450px] bg-white shadow-2xl transform transition-transform p-5 ${isOpen ? "translate-x-0" : "-translate-x-full"
-          } overflow-y-auto`}
+        className={`pb-[30px] fixed left-0 top-0 h-full w-[80%] sm:w-[450px] bg-white shadow-2xl transform transition-transform p-5 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } overflow-y-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center pb-3">
@@ -279,15 +310,22 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
               {filter.type === "checkbox" &&
                 filter.options.map((item, index) => (
                   <label
-                    // key={typeof item === 'object' ? item._id : item}
+                    // key={typeof item === 'object' ? item.id : item}
                     key={index}
                     className="flex items-center space-x-2 cursor-pointer text-black"
                   >
                     <Checkbox
-                      checked={selectedFilters[key]?.includes(typeof item === 'object' ? item.name : item)}
-                      onChange={() => handleSelect(key, typeof item === 'object' ? item.name : item)}
+                      checked={selectedFilters[key]?.includes(
+                        typeof item === "object" ? item.name : item
+                      )}
+                      onChange={() =>
+                        handleSelect(
+                          key,
+                          typeof item === "object" ? item.name : item
+                        )
+                      }
                     />
-                    <span>{typeof item === 'object' ? item.name : item}</span>
+                    <span>{typeof item === "object" ? item.name : item}</span>
                   </label>
                 ))}
 
@@ -299,12 +337,17 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
                       className="flex flex-col items-center justify-center cursor-pointer"
                     >
                       <div
-                        className={`w-7 h-7 rounded-full border ${selectedFilters?.product_color?.includes(colorOption.name)
-                          ? "ring-2 ring-black"
-                          : ""
-                          }`}
+                        className={`w-7 h-7 rounded-full border ${
+                          selectedFilters?.product_color?.includes(
+                            colorOption.name
+                          )
+                            ? "ring-2 ring-black"
+                            : ""
+                        }`}
                         style={{ backgroundColor: colorOption.color }}
-                        onClick={() => handleSelect("product_color", colorOption.name)}
+                        onClick={() =>
+                          handleSelect("product_color", colorOption.name)
+                        }
                       ></div>
                       <span className="mt-2 text-sm font-medium text-center">
                         {colorOption.name}

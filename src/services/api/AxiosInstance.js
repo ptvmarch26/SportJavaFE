@@ -1,9 +1,12 @@
 import axios from "axios";
+import qs from "qs";
 import { refreshToken } from "./AuthApi";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AxiosInstance = axios.create({
   baseURL: API_URL,
+  paramsSerializer: (params) =>
+    qs.stringify(params, { arrayFormat: "repeat" }),
 });
 
 AxiosInstance.interceptors.request.use(

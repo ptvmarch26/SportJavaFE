@@ -30,7 +30,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       const user = await fetchUser();
-      if (user?.result?.role !== "admin") {
+      if (user?.result?.role !== "ADMIN") {
         window.location.href = "/sign-in";
       } else {
         const usersData = await fetchUsers();

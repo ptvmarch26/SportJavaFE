@@ -9,7 +9,6 @@ export const ProductProvider = ({ children }) => {
 
   const fetchProducts = async (filters = {}) => {
     const res = await getAllProducts(filters);
-    console.log("all", res);
     if (res?.EC === 0) {
         setProducts(res.result.products);
     } else {
