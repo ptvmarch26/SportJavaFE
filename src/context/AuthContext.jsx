@@ -31,7 +31,12 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogin = async (user_name, password) => {
     const data = await login(user_name, password);
-    if (data?.result?.accessToken && data?.result?.refreshToken) {
+    // if (data?.result?.accessToken && data?.result?.refreshToken) {
+    //   setToken(data?.result?.accessToken);
+    //   localStorage.setItem("accessToken", data.result.accessToken);
+    //   localStorage.setItem("refreshToken", data.result.refreshToken);
+    // }
+    if (data?.result?.accessToken) {
       setToken(data?.result?.accessToken);
       localStorage.setItem("accessToken", data.result.accessToken);
       localStorage.setItem("refreshToken", data.result.refreshToken);

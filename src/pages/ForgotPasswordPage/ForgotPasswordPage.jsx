@@ -30,14 +30,14 @@ const ForgotPasswordPage = () => {
       return;
     }
     setError("");
+    setOtpError("");
     setLoading(true, "Vui lòng chờ")
     const res = await handleSendOTP(email);
-    if (res?.EM === "OTP sent successfully") {
+    console.log("res", res);
+    if (res?.EC === 0) {
       setStep(1);
-    } else if (res?.EM === "User not found") {
-      setError("Người dùng không tồn tại");
     } else {
-      setError("Gửi mã OTP thất bại, vui lòng thử lại");
+      setError(res?.EM);
     }
     setLoading(false);
   };
@@ -53,10 +53,11 @@ const ForgotPasswordPage = () => {
     setOtpError("");
 
     const res = await handleVerifyOTP(email, otpString);
-    if (res?.EM === "OTP verified successfully") {
+    console.log("veryfy", res);
+    if (res?.EC === 0) {
       setStep(2);
-    } else if (res?.EM === "Invalid OTP") {
-      setOtpError("Mã OTP không hợp lệ");
+    } else {
+      setOtpError(res?.EM);
     }
   };
 
@@ -80,7 +81,8 @@ const ForgotPasswordPage = () => {
     }
 
     const res = await handleResetPassword(email, newPassword);
-    if (res?.EM === "Password reset successfully") {
+    console.log("aaaa", res);
+    if (res?.EC === 0) {
       showPopup("Đổi mật khẩu thành công. Vui lòng đăng nhập lại", true, 1000);
       navigate("/sign-in");
     } else {

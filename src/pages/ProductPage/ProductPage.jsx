@@ -39,7 +39,10 @@ const ProductPage = () => {
   }, [category, category_gender, category_sub]);
 
   useEffect(() => {
-    fetchProducts(selectedFilters);
+    const fetchData = async () => {
+      await fetchProducts(selectedFilters);
+    };
+    fetchData();
   }, [selectedFilters]);
 
   const { token } = useAuth();
@@ -214,13 +217,13 @@ const ProductPage = () => {
         {sortProducts
           .slice((currentPage - 1) * 12, currentPage * 12)
           .map((product) => (
-            <AnimationScroll key={product._id} type="fadeUp" delay={0.1}>
+            <AnimationScroll key={product.id} type="fadeUp" delay={0.1}>
               <ProductComponent
-                key={product._id}
+                key={product.id}
                 item={product}
                 favourites={favourites}
                 onFavouriteChange={fetchFavourites}
-                onClick={() => navigate(`/product/${product._id}`)}
+                onClick={() => navigate(`/product/${product.id}`)}
               />
             </AnimationScroll>
           ))}

@@ -9,6 +9,7 @@ export const ProductProvider = ({ children }) => {
 
   const fetchProducts = async (filters = {}) => {
     const res = await getAllProducts(filters);
+    console.log("all", res);
     if (res?.EC === 0) {
         setProducts(res.result.products);
     } else {
@@ -19,6 +20,7 @@ export const ProductProvider = ({ children }) => {
 
   const fetchProductDetails = async (productId) => {
     const res = await getDetailsProduct(productId);
+    console.log("prdt", res);
     if (res?.EC === 0) {
         setProductDetails(res.result);
     } else {

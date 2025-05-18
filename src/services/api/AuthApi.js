@@ -1,10 +1,10 @@
 import AxiosInstance from "./AxiosInstance";
 import { auth, provider, signInWithPopup } from "../../config/firebase";
 
-export const signUp = async (user_name, email, password) => {
+export const signUp = async (username, email, password) => {
   try {
-    const res = await AxiosInstance.post("/auth/sign_up", {
-      user_name,
+    const res = await AxiosInstance.post("/auth/sign-up", {
+      username,
       email,
       password,
     });
@@ -15,10 +15,10 @@ export const signUp = async (user_name, email, password) => {
 };
 
 // Đăng nhập
-export const login = async (user_name, password) => {
+export const login = async (username, password) => {
   try {
-    const res = await AxiosInstance.post("/auth/login", {
-      user_name,
+    const res = await AxiosInstance.post("/auth/sign-in", {
+      username,
       password,
     });
     return res.data;
@@ -30,7 +30,7 @@ export const login = async (user_name, password) => {
 // Gửi mã OTP qua email
 export const sendOTP = async (email) => {
   try {
-    const res = await AxiosInstance.post("/auth/send_otp", { email });
+    const res = await AxiosInstance.post("/auth/send-otp", { email });
     return res.data;
   } catch (error) {
     return error.response?.data || { EM: "Gửi OTP thất bại" };
@@ -40,7 +40,7 @@ export const sendOTP = async (email) => {
 // Xác thực mã OTP
 export const verifyOTP = async (email, otp) => {
   try {
-    const res = await AxiosInstance.post("/auth/verify_otp", {
+    const res = await AxiosInstance.post("/auth/verify-otp", {
       email,
       otp,
     });
@@ -53,7 +53,7 @@ export const verifyOTP = async (email, otp) => {
 // Đặt lại mật khẩu
 export const resetPassword = async (email, newPassword) => {
   try {
-    const res = await AxiosInstance.patch("/auth/reset_password", {
+    const res = await AxiosInstance.patch("/auth/reset-password", {
       email,
       newPassword,
     });
@@ -79,7 +79,7 @@ export const signUpWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const res = await AxiosInstance.post("/auth/signup_with_google", {
+    const res = await AxiosInstance.post("/auth/signup-with-google", {
       email: user.email,
       user_name: user.email,
       uid: user.uid,
@@ -94,7 +94,7 @@ export const loginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const res = await AxiosInstance.post("/auth/login_with_google", {
+    const res = await AxiosInstance.post("/auth/signin-with-google", {
       email: user.email,
       uid: user.uid,
     });

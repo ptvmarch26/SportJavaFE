@@ -39,7 +39,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchBanner = async () => {
       const res = await getDetailStore(storeId);
-      if (res.EC === 0 && res.EM) {
+      if (res?.EC === 0 && res?.EM) {
         const { store_banner } = res.EM;
         setBanners(store_banner);
       }

@@ -21,7 +21,7 @@ const HeaderLogo = ({ title }) => {
             <h1 className="text-white font-semibold text-xl">{title}</h1>
           </div>
           <Link
-            to={"/help-center"}
+            to={"/"}
             className=" text-white text-md group -mt-[4px] relative"
           >
             Bạn cần trợ giúp?
