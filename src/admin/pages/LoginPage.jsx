@@ -37,7 +37,7 @@ const LoginPage = () => {
     setError(newError);
     // còn lỗi vặt ở hiển thị lỗi nào
     const response = await handleLogin(username, password);
-    if (response?.EC === 0 && response?.result?.user.role === "admin") {
+    if (response?.EC === 0 && response?.result?.user.role === "ADMIN") {
       showPopup(`${response.EM}, Chào mừng bạn đến với trang quản trị`);
       navigate("/admin/dashboard");
     } else {

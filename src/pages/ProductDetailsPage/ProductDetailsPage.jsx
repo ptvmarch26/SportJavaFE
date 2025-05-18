@@ -15,7 +15,7 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       await fetchProductDetails(id);
-    }
+    };
     fetchData();
     window.scrollTo(0, 0);
   }, [id]);
@@ -23,41 +23,48 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       await fetchProducts();
-    }
+    };
     fetchData();
-
-    
   }, []);
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
-        setItemsToShow(8); 
+        setItemsToShow(8);
       } else {
-        setItemsToShow(6); 
+        setItemsToShow(6);
       }
     };
 
-    handleResize(); 
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-  },[]);
+  }, []);
 
   const [itemsToShow, setItemsToShow] = useState(6);
 
   const relatedProducts = products
-  .filter((p) => {
-    if (!p || !p.product_category || !productDetails || !productDetails.product_category) return false;
-    return (
-      p._id !== productDetails._id &&
-      p.product_category.category_type === productDetails.product_category.category_type &&
-      p.product_category.category_gender === productDetails.product_category.category_gender
-    );
-  })
-  .slice(0, itemsToShow);
+    .filter((p) => {
+      if (
+        !p ||
+        !p.productCategory ||
+        !productDetails ||
+        !productDetails.productCategory
+      )
+        return false;
+      return (
+        p.id !== productDetails.id &&
+        p.productCategory.categoryType ===
+          productDetails.productCategory.categoryType &&
+        p.productCategory.categoryGender ===
+          productDetails.productCategory.categoryGender
+      );
+    })
+    .slice(0, itemsToShow);
 
-  console.log("productDetails", productDetails)
+  console.log("products", products);
+  console.log("productDetails", productDetails);
 
   return (
     <div className="container mx-auto px-2">
@@ -70,10 +77,10 @@ const ProductDetailsPage = () => {
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {relatedProducts.map((product) => (
-            <AnimationScroll key={product?._id} type="fadeUp" delay={0.1}>
+            <AnimationScroll key={product?.id} type="fadeUp" delay={0.1}>
               <ProductComponent
                 item={product}
-                onClick={() => navigate(`/product/${product?._id}`)}
+                onClick={() => navigate(`/product/${product?.id}`)}
               />
             </AnimationScroll>
           ))}

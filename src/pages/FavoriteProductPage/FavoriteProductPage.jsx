@@ -46,7 +46,7 @@ const FavoriteProductPage = () => {
     if (updatedFavourites) {
       setCart(updatedFavourites);
       setProducts((prevProducts) =>
-        prevProducts.filter((item) => item._id !== id)
+        prevProducts.filter((item) => item.id !== id)
       );
     }
   };

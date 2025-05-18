@@ -1,30 +1,22 @@
-import { useState } from "react";
 import { Button, IconButton } from "@material-tailwind/react";
 import { HiArrowSmRight, HiArrowSmLeft } from "react-icons/hi";
 
 const PanigationComponent = ({ currentPage, totalPages, onPageChange }) => {
-  const [active, setActive] = useState(currentPage || 1);
-
-  const handlePageChange = (index) => {
-    setActive(index);
-    onPageChange(index);
-  };
-
   const getItemProps = (index) => ({
-    variant: active === index ? "filled" : "text",
+    variant: currentPage === index ? "filled" : "text",
     color: "gray",
-    onClick: () => handlePageChange(index),
+    onClick: () => onPageChange(index),
   });
 
   const next = () => {
-    if (active < totalPages) {
-      handlePageChange(active + 1);
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
     }
   };
 
   const prev = () => {
-    if (active > 1) {
-      handlePageChange(active - 1);
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
     }
   };
 
@@ -34,7 +26,7 @@ const PanigationComponent = ({ currentPage, totalPages, onPageChange }) => {
         variant="text"
         className="flex items-center gap-2"
         onClick={prev}
-        disabled={active === 1}
+        disabled={currentPage === 1}
       >
         <HiArrowSmLeft className="h-4 w-4" />
       </Button>
@@ -49,7 +41,7 @@ const PanigationComponent = ({ currentPage, totalPages, onPageChange }) => {
         variant="text"
         className="flex items-center gap-2"
         onClick={next}
-        disabled={active === totalPages}
+        disabled={currentPage === totalPages}
       >
         <HiArrowSmRight className="h-4 w-4" />
       </Button>

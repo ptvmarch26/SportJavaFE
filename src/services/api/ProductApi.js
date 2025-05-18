@@ -169,10 +169,20 @@ export const getAllProducts = async (filters) => {
   if (typeof filters === "string") {
     filters = JSON.parse(filters);
   }
+
+  const params = {
+    categoryGender: filters.category_gender,
+    category: filters.category,
+    categorySub: filters.category_sub,
+    productColor: filters.product_color,
+    productBrand: filters.product_brand,
+    priceMin: filters.price_min,
+    priceMax: filters.price_max,
+  };
+  console.log("params", params);
+
   try {
-    const response = await AxiosInstance.get("/product/get-all", {
-      params: filters,
-    });
+    const response = await AxiosInstance.get("/product/get-all", { params });
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";

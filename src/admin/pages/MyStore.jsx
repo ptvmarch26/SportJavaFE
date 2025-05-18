@@ -5,7 +5,7 @@ import { getDetailStore, updateStore } from "../../services/api/StoreApi";
 import { usePopup } from "../../context/PopupContext";
 
 const MyStore = () => {
-  const storeId = "680a5a2fe8930a6de2ee81d2";
+  const storeId = import.meta.env.VITE_STORE_ID;
   const [storeInfo, setStoreInfo] = useState({
     address: "",
     phone: "",
@@ -24,14 +24,15 @@ const MyStore = () => {
   useEffect(() => {
     const fetchStore = async () => {
       const res = await getDetailStore(storeId);
+      console.log("res", res);
       if (res.EC === 0 && res.EM) {
-        const { store_address, store_email, store_phone, store_banner } =
-          res.EM;
+        const { storeAddress, storeEmail, storePhone, storeBanner } =
+          res.result;
         setStoreInfo({
-          address: store_address || "",
-          email: store_email || "",
-          phone: store_phone || "",
-          banners: store_banner || [],
+          address: storeAddress || "",
+          email: storeEmail || "",
+          phone: storePhone || "",
+          banners: storeBanner || [],
         });
       }
     };
@@ -75,15 +76,15 @@ const MyStore = () => {
     try {
       const formData = new FormData();
 
-      formData.append("store_address", storeInfo.address);
-      formData.append("store_email", storeInfo.email);
-      formData.append("store_phone", storeInfo.phone);
+      formData.append("storeAddress", storeInfo.address);
+      formData.append("storeEmail", storeInfo.email);
+      formData.append("storePhone", storeInfo.phone);
 
       // Xử lý các banner base64
       const existingBanners = storeInfo.banners.filter(
         (banner) => !banner.startsWith("data:")
       );
-      formData.append("existing_banners", JSON.stringify(existingBanners));
+      formData.append("existingBanners", JSON.stringify(existingBanners));
 
       // Process new banners (base64)
       const base64Banners = storeInfo.banners.filter((banner) =>
@@ -107,13 +108,13 @@ const MyStore = () => {
         // Tải lại dữ liệu từ server
         const updatedStoreRes = await getDetailStore(storeId);
         if (updatedStoreRes.EC === 0 && updatedStoreRes.EM) {
-          const { store_address, store_email, store_phone, store_banner } =
-            updatedStoreRes.EM;
+          const { storeAddress, storeEmail, storePhone, storeBanner } =
+            updatedStoreRes.result;
           setStoreInfo({
-            address: store_address || "",
-            email: store_email || "",
-            phone: store_phone || "",
-            banners: store_banner || [],
+            address: storeAddress || "",
+            email: storeEmail || "",
+            phone: storePhone || "",
+            banners: storeBanner || [],
           });
         }
       } else {

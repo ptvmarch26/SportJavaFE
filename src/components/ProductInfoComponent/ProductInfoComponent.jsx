@@ -80,13 +80,13 @@ const ProductInfoComponent = ({ product }) => {
 
   const toggleFavorite = async () => {
     setIsFavorite(!isFavorite);
-    await updateFavourite(product._id);
+    await updateFavourite(product.id);
   };
 
   const { handleAddToCart, setCart, cart } = useCart();
   const handlePushtoCart = async () => {
     const res = await handleAddToCart(
-      product._id,
+      product.id,
       selectedColor,
       selectedSize,
       quantity
@@ -95,8 +95,8 @@ const ProductInfoComponent = ({ product }) => {
       const existingIndex = cart.products.findIndex(
         (item) =>
           item.product_id._id === product._id &&
-          item.color_name === selectedColor &&
-          item.variant_name === selectedSize
+          item.colorName === selectedColor &&
+          item.variantName === selectedSize
       );
 
       const updatedCart = { ...cart };
@@ -117,7 +117,7 @@ const ProductInfoComponent = ({ product }) => {
       setCart(updatedCart);
       showPopup(res.EM);
     } else {
-      showPopup(res.EM || "Đã có lỗi xảy ra.");
+      showPopup(res.EM || "Đã có lỗi xảy ra.", false);
     }
   };
 
@@ -127,16 +127,16 @@ const ProductInfoComponent = ({ product }) => {
     setAvailableVariants([]);
 
     const fetchFavoriteStatus = async () => {
-      if(token){
+      if (token) {
         const favouritesData = await getFavourite();
         if (favouritesData && favouritesData.result) {
-          setIsFavorite(favouritesData.result.includes(product._id));
+          setIsFavorite(favouritesData.result.includes(product.id));
         }
       }
     };
 
     fetchFavoriteStatus();
-  }, [product?._id]);
+  }, [product?.id]);
 
   const toggleDetails = () => setIsDetailsVisible(!isDetailsVisible);
 
@@ -154,7 +154,7 @@ const ProductInfoComponent = ({ product }) => {
 
   const handleNavigateCheckout = () => {
     navigate(
-      `/checkout/${product._id}?quantity=${quantity}&color=${selectedColor}&size=${selectedSize}`
+      `/checkout/${product.id}?quantity=${quantity}&color=${selectedColor}&size=${selectedSize}`
     );
   };
 
@@ -162,19 +162,21 @@ const ProductInfoComponent = ({ product }) => {
   const getAllImages = (product) => {
     if (!product) return [];
 
-    let images = [product?.product_img];
+    let images = [product?.productImg];
 
     // Lấy ảnh từ biến thể
     product.colors?.forEach((color) => {
-      images.push(color?.imgs?.img_main);
-      images.push(...(color?.imgs?.img_subs || []));
+      images.push(color?.imgs?.imgMain);
+      images.push(...(color?.imgs?.imgSubs || []));
     });
 
     // Lọc bỏ ảnh null hoặc undefined
     images = images.filter((img) => img);
 
-    while (images.length < 5) {
-      images = [...images, ...images];
+    if (images.length > 0) {
+      while (images.length < 5) {
+        images = [...images, ...images];
+      }
     }
 
     return images;
@@ -183,14 +185,18 @@ const ProductInfoComponent = ({ product }) => {
   const allImages = getAllImages(product);
 
   const handleColorSelect = (color) => {
-    setSelectedColor(color.color_name);
+    setSelectedColor(color.colorName);
     setAvailableVariants(color.variants);
     setSelectedSize(null);
 
-    const mainColorImg = color.imgs?.img_main;
+    const mainColorImg = color.imgs?.imgMain;
     const index = allImages.findIndex((img) => img === mainColorImg);
 
-    if (index !== -1 && mainSliderRef.current && mainSliderRef.current.slickGoTo) {
+    if (
+      index !== -1 &&
+      mainSliderRef.current &&
+      mainSliderRef.current.slickGoTo
+    ) {
       mainSliderRef.current.slickGoTo(index);
       setCurrentIndex(index);
     }
@@ -201,7 +207,7 @@ const ProductInfoComponent = ({ product }) => {
     }
   };
 
-  console.log("pr", product);
+  // console.log("pr", product);
 
   return (
     <div className="flex flex-col lg:flex-row lg:p-10 gap-10">
@@ -224,12 +230,13 @@ const ProductInfoComponent = ({ product }) => {
                 <img
                   src={img}
                   alt={`Thumbnail ${index}`}
-                  className={`w-full h-20 object-cover cursor-pointer border-2 ${index === currentIndex
+                  className={`w-full h-20 object-cover cursor-pointer border-2 ${
+                    index === currentIndex
                       ? "border-black"
                       : "border-transparent"
-                    }`}
+                  }`}
                   onClick={() => handleThumbClick(index)}
-                // onMouseEnter={() => handleThumbClick(index)}
+                  // onMouseEnter={() => handleThumbClick(index)}
                 />
               </div>
             ))}
@@ -259,22 +266,22 @@ const ProductInfoComponent = ({ product }) => {
               đ
             </p>
           )}
-          {product?.product_percent_discount > 0 &&
+          {product?.productPercentDiscount > 0 &&
             selectedColor &&
             selectedSize && (
               <>
                 <p className="text-md text-[#9ca3af] line-through mr-4">
                   {(
                     (availableVariants.find(
-                      (v) => v.variant_size === selectedSize
-                    )?.variant_price *
+                      (v) => v.variantSize === selectedSize
+                    )?.variantPrice *
                       100) /
-                    (100 - product.product_percent_discount)
+                    (100 - product.productPercentDiscount)
                   ).toLocaleString()}
                   đ
                 </p>
                 <p className="text-md font-semibold text-[#158857]">
-                  {product?.product_percent_discount}% Off
+                  {product?.productPercentDiscount}% Off
                 </p>
               </>
             )}
@@ -289,13 +296,14 @@ const ProductInfoComponent = ({ product }) => {
                 <Button
                   key={index}
                   color="white"
-                  className={`w-24 h-14 border-gray-400 flex items-center justify-center p-2 border rounded-md shadow-md ${selectedColor === color.color_name
+                  className={`w-24 h-14 border-gray-400 flex items-center justify-center p-2 border rounded-md shadow-md ${
+                    selectedColor === color.colorName
                       ? "border-2 border-black"
                       : ""
-                    }`}
+                  }`}
                   onClick={() => handleColorSelect(color)}
                 >
-                  {color.color_name}
+                  {color.colorName}
                 </Button>
               ))}
             </div>
@@ -311,14 +319,15 @@ const ProductInfoComponent = ({ product }) => {
                     <Button
                       key={variant._id}
                       color="white"
-                      className={`w-14 h-14 border-gray-400 flex items-center justify-center border rounded-md shadow-md ${selectedSize === variant.variant_size
+                      className={`w-14 h-14 border-gray-400 flex items-center justify-center border rounded-md shadow-md ${
+                        selectedSize === variant.variantSize
                           ? "border-2 border-black"
                           : ""
-                        }`}
-                      onClick={() => setSelectedSize(variant.variant_size)}
-                      disabled={variant.variant_countInStock === 0}
+                      }`}
+                      onClick={() => setSelectedSize(variant.variantSize)}
+                      disabled={variant.variantCountInStock === 0}
                     >
-                      {variant.variant_size}
+                      {variant.variantSize}
                     </Button>
                   ))}
                 </div>
@@ -354,8 +363,8 @@ const ProductInfoComponent = ({ product }) => {
             {selectedColor && selectedSize ? (
               <>
                 Còn lại:{" "}
-                {availableVariants.find((v) => v.variant_size === selectedSize)
-                  ?.variant_countInStock ?? 0}{" "}
+                {availableVariants.find((v) => v.variantSize === selectedSize)
+                  ?.variantCountInStock ?? 0}{" "}
                 sản phẩm
               </>
             ) : (
@@ -410,11 +419,12 @@ const ProductInfoComponent = ({ product }) => {
           )}
         </div>
         <div
-          className={`mt-4 text-sm text-black transition-all ${isDetailsVisible ? "max-h-[500px]" : "max-h-0 opacity-0"
-            }`}
+          className={`mt-4 text-sm text-black transition-all ${
+            isDetailsVisible ? "max-h-[500px]" : "max-h-0 opacity-0"
+          }`}
         >
           <p className="text-justify leading-loose">
-            {product?.product_description}
+            {product?.productDescription}
           </p>
         </div>
       </div>

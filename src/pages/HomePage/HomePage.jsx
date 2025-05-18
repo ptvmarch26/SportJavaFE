@@ -22,6 +22,7 @@ import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import { getDetailStore } from "../../services/api/StoreApi";
 
 const HomePage = () => {
+  const storeId = import.meta.env.VITE_STORE_ID;
   const navigate = useNavigate();
   const { products, fetchProducts } = useProduct();
   const [productFamous, setProductFamous] = useState([]);
@@ -32,16 +33,14 @@ const HomePage = () => {
 
   const [favourites, setFavourites] = useState([]);
   const { token } = useAuth();
-
-  const storeId = "680a5a2fe8930a6de2ee81d2";
   const [banners, setBanners] = useState([]);
 
   useEffect(() => {
     const fetchBanner = async () => {
       const res = await getDetailStore(storeId);
       if (res?.EC === 0 && res?.EM) {
-        const { store_banner } = res.EM;
-        setBanners(store_banner);
+        const { storeBanner } = res.result;
+        setBanners(storeBanner);
       }
     };
 
@@ -83,11 +82,11 @@ const HomePage = () => {
 
   useEffect(() => {
     const productFamous = products.filter(
-      (product) => product.product_famous === true
+      (product) => product.productFamous === true
     );
 
     const productSelled = products.filter(
-      (product) => product.product_selled >= 10
+      (product) => product.productSelled >= 10
     );
 
     const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000; // 7 ngày tính bằng milliseconds
@@ -118,89 +117,6 @@ const HomePage = () => {
     },
   ];
 
-  // const typeSports = [
-  //   {
-  //     image: running,
-  //     type: "Chạy bộ",
-  //     onClick: () => {
-  //       navigate("/");
-  //     },
-  //   },
-  //   {
-  //     image: soccer,
-  //     type: "Bóng đá",
-  //     onClick: () => {
-  //       navigate("/");
-  //     },
-  //   },
-  //   {
-  //     image: gym,
-  //     type: "Thể hình",
-  //     onClick: () => {
-  //       navigate("/");
-  //     },
-  //   },
-  //   {
-  //     image: basketball,
-  //     type: "Bóng rổ",
-  //     onClick: () => {
-  //       navigate("/");
-  //     },
-  //   },
-  //   {
-  //     image: tennis,
-  //     type: "Tennis",
-  //     onClick: () => {
-  //       navigate("/");
-  //     },
-  //   },
-  // ];
-
-  // const settings = {
-  //   dots: true,
-  //   speed: 500,
-  //   slidesToShow: 3,
-  //   slidesToScroll: 1,
-  //   nextArrow: (
-  //     <NextComponent
-  //       position="absolute"
-  //       zIndex="1"
-  //       top="50%"
-  //       right="10px"
-  //       transform="translateY(-50%)"
-  //       fontSize="2rem"
-  //       color="white"
-  //     />
-  //   ),
-  //   prevArrow: (
-  //     <BackComponent
-  //       position="absolute"
-  //       zIndex="1"
-  //       top="50%"
-  //       left="10px"
-  //       transform="translateY(-50%)"
-  //       fontSize="2rem"
-  //       color="white"
-  //     />
-  //   ),
-  //   responsive: [
-  //     {
-  //       breakpoint: 1024,
-  //       settings: {
-  //         slidesToShow: 2,
-  //         slidesToScroll: 1,
-  //       },
-  //     },
-  //     {
-  //       breakpoint: 640,
-  //       settings: {
-  //         slidesToShow: 1,
-  //         slidesToScroll: 1,
-  //       },
-  //     },
-  //   ],
-  // };
-
   return (
     <div className="">
       <div className="container mx-auto my-6 px-2">
@@ -208,7 +124,7 @@ const HomePage = () => {
           className="h-[200px] md:h-[300px] lg:h-[400px] w-full"
           navigation={({ setActiveIndex, activeIndex, length }) => (
             <div className="absolute bottom-4 left-2/4 z-50 flex -translate-x-2/4 gap-2">
-              {new Array(length).fill("").map((_, i) => (
+              {new Array(length).fill("")?.map((_, i) => (
                 <span
                   key={i}
                   className={`block h-1 cursor-pointer rounded-2xl transition-all ${
@@ -222,7 +138,7 @@ const HomePage = () => {
           loop
           autoplay
         >
-          {banners.map((slide, index) => (
+          {banners?.map((slide, index) => (
             <div
               key={index}
               className="w-full h-full flex items-center justify-center"
@@ -237,7 +153,7 @@ const HomePage = () => {
         </Carousel>
 
         <div>
-          {productsStatus.map((productStatus, index) => {
+          {productsStatus?.map((productStatus, index) => {
             return (
               <div
                 key={index}
@@ -251,7 +167,7 @@ const HomePage = () => {
                     .slice(0, productsToShow)
                     .map((product) => (
                       <AnimationScroll
-                        key={product._id}
+                        key={product.id}
                         type="fadeUp"
                         delay={0.1}
                       >
@@ -259,7 +175,7 @@ const HomePage = () => {
                           item={product}
                           favourites={favourites}
                           onFavouriteChange={fetchFavourites}
-                          onClick={() => navigate(`/product/${product._id}`)} // Chuyển đến trang chi tiết sản phẩm
+                          onClick={() => navigate(`/product/${product.id}`)} // Chuyển đến trang chi tiết sản phẩm
                         />
                       </AnimationScroll>
                     ))}
@@ -280,20 +196,6 @@ const HomePage = () => {
             );
           })}
         </div>
-        {/* <div>
-          <div className="border-t-2 border-[rgba(0, 0, 0, 0.1)] w-full my-8 mb-10">
-            <p className="uppercase text-4xl font-extrabold text-center my-8">
-              Theo môn thể thao
-            </p>
-            <Slider {...settings}>
-              {typeSports.map((sport, index) => (
-                <AnimationScroll key={index} type="fadeUp" delay={0.1}>
-                  <CardComponent {...sport} />
-                </AnimationScroll>
-              ))}
-            </Slider>
-          </div>
-        </div> */}
       </div>
     </div>
   );
