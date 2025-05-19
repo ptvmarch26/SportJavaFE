@@ -10,22 +10,22 @@ const Profile = () => {
   const { setLoading } = useLoading();
 
   const [formData, setFormData] = useState({
-    user_name: selectedUser?.user_name || "Chưa cập nhật",
-    full_name: selectedUser?.full_name,
+    user_name: selectedUser?.username || "Chưa cập nhật",
+    full_name: selectedUser?.fullName,
     birth: selectedUser?.birth || "",
     gender: selectedUser?.gender,
-    avt_img: selectedUser?.avt_img || avt_false,
+    avt_img: selectedUser?.avtimg || avt_false,
   });
 
   // Cập nhật formData khi selectedUser thay đổi
   useEffect(() => {
     if (selectedUser) {
       setFormData({
-        user_name: selectedUser.user_name || "Chưa cập nhật",
-        full_name: selectedUser.full_name,
+        user_name: selectedUser.username || "Chưa cập nhật",
+        full_name: selectedUser.fullName,
         birth: selectedUser.birth || "",
         gender: selectedUser.gender || "",
-        avt_img: selectedUser.avt_img || avt_false,
+        avt_img: selectedUser.avtimg || avt_false,
       });
     }
   }, [selectedUser]);
@@ -41,18 +41,19 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
-    setLoading(true, "Đang đổi thông tin");
+    // setLoading(true, "Đang đổi thông tin");
     const form = new FormData();
-    form.append("user_name", formData.user_name);
-    form.append("full_name", formData.full_name);
+    form.append("username", formData.username);
+    form.append("fullName", formData.fullName);
     form.append("birth", formData.birth);
     form.append("gender", formData.gender);
 
     if (avatarFile) {
-      form.append("avatar", avatarFile); // <- tên phải trùng với `multer` backend
+      form.append("avatarimg", avatarFile); // <- tên phải trùng với `multer` backend
     }
 
     const res = await handleUpdateUser(form);
+    console.log("res", res);
     if (res?.EC === 0) {
       fetchUser();
       setOriginalData(formData);
@@ -67,11 +68,11 @@ const Profile = () => {
   useEffect(() => {
     if (selectedUser) {
       const updatedForm = {
-        user_name: selectedUser.user_name || "Chưa cập nhật",
-        full_name: selectedUser.full_name,
+        user_name: selectedUser.username || "Chưa cập nhật",
+        full_name: selectedUser.fullName,
         birth: selectedUser.birth || "",
         gender: selectedUser.gender || "",
-        avt_img: selectedUser.avt_img || avt_false,
+        avt_img: selectedUser.avtimg || avt_false,
       };
       setOriginalData(updatedForm);
     }
@@ -100,6 +101,8 @@ const Profile = () => {
     }
   };
 
+  console.log("selec", selectedUser)
+
   return (
     <div className="lg:px-6 bg-white">
       <div className="flex justify-between items-center mb-6">
@@ -121,10 +124,10 @@ const Profile = () => {
           }}
         />
         <h2 className="block lg:hidden text-lg font-semibold text-gray-800">
-          {selectedUser?.full_name || "Chưa cập nhật"}
+          {selectedUser?.fullName || "Chưa cập nhật"}
         </h2>
         <p className="block lg:hidden text-gray-500 text-sm">
-          {selectedUser?.user_name || "Chưa cập nhật"}
+          {selectedUser?.username || "Chưa cập nhật"}
         </p>
         <input
           type="file"
