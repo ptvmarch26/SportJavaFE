@@ -34,11 +34,11 @@ const OrderFeedbackPage = () => {
     ) {
       setFeedback(
         orderDetails.products.map((product) => ({
-          product_id: product.product_id._id,
-          color: product.color,
-          variant: product.variant,
-          order_id: orderDetails._id,
-          user_id: orderDetails.user_id,
+          product_id: product.productId,
+          color: product.colorName,
+          variant: product.variantName,
+          order_id: orderDetails?.id,
+          user_id: orderDetails?.userId,
           content: "",
           rating: 0,
           images: [],
@@ -51,22 +51,23 @@ const OrderFeedbackPage = () => {
 
   // Hàm tìm giá variant và hình ảnh dựa vào màu sắc và kích thước
   const findProductDetails = (product) => {
-    const colorOption = product.product_id.colors.find(
-      (c) => c.color_name === product.color
+    const colorOption = product?.product?.colors.find(
+      (c) => c.colorName === product.colorName
     );
 
-    let variantPrice = product.product_id.product_price;
-    let productImage = product.product_id.product_img;
+    let variantPrice = product.product?.productPrice;
+    let productImage = product.product?.productImg;
 
     if (colorOption) {
-      productImage = colorOption.imgs.img_main;
+      productImage = colorOption.imgs?.imgMain;
 
+      // Tìm biến thể tương ứng
       const variantOption = colorOption.variants.find(
-        (v) => v.variant_size === product.variant
+        (v) => v.variantSize === product.variantName
       );
 
       if (variantOption) {
-        variantPrice = variantOption.variant_price;
+        variantPrice = variantOption.variantPrice;
       }
     }
 
@@ -139,19 +140,20 @@ const OrderFeedbackPage = () => {
 
       for (const item of feedback) {
         const formData = new FormData();
-        formData.append("product_id", item.product_id);
-        formData.append("order_id", id);
+        formData.append("productId", item.product_id);
+        formData.append("orderId", id);
+        formData.append("userId", item.user_id);
         formData.append("content", item.content);
         formData.append("rating", item.rating);
         formData.append("color", item.color);
         formData.append("variant", item.variant);
 
         item.images.forEach((image) => {
-          formData.append("files", image);
+          formData.append("images", image);
         });
 
         item.videos.forEach((video) => {
-          formData.append("files", video);
+          formData.append("videos", video);
         });
 
         const result = await createFeedback(formData);
@@ -203,9 +205,9 @@ const OrderFeedbackPage = () => {
         {orderDetails.products.map((product, index) => {
           const { variantPrice, productImage } = findProductDetails(product);
           const discountedPrice =
-            product.product_id.product_percent_discount > 0
+            product.product?.productPercentDiscount > 0
               ? (variantPrice *
-                  (100 - product.product_id.product_percent_discount)) /
+                  (100 - product.product?.productPercentDiscount)) /
                 100
               : variantPrice;
 
@@ -217,20 +219,20 @@ const OrderFeedbackPage = () => {
               <div className="flex items-center gap-4 py-4">
                 <img
                   src={productImage}
-                  alt={product.product_id.product_title}
+                  alt={product.product?.productTitle}
                   className="w-16 h-16 object-cover border border-gray-300 rounded"
                 />
                 <div className="flex-1">
                   <p className="text-sm font-semibold line-clamp-1">
-                    {product.product_id.product_title}
+                    {product.product?.productTitle}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {product.color} - {product.variant}
+                    {product?.colorName} - {product?.variantName}
                   </p>
                   <p className="text-sm">x{product.quantity}</p>
                 </div>
                 <div className="flex space-x-2">
-                  {product.product_id.product_percent_discount > 0 && (
+                  {product.product?.productPercentDiscount > 0 && (
                     <p className="text-[#9ca3af] line-through">
                       {variantPrice.toLocaleString()}đ
                     </p>

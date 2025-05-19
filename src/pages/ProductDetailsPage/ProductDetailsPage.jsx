@@ -63,9 +63,6 @@ const ProductDetailsPage = () => {
     })
     .slice(0, itemsToShow);
 
-  console.log("products", products);
-  console.log("productDetails", productDetails);
-
   return (
     <div className="container mx-auto px-2">
       <ProductInfoComponent product={productDetails} />

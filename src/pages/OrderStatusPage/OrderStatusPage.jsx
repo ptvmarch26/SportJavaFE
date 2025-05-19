@@ -24,23 +24,33 @@ const OrderStatusPage = () => {
     fetchOrdersByUser();
   }, []);
 
-  const tabs = [
-    { id: "all", label: "Tất cả" },
-    { id: "Chờ xác nhận", label: "Chờ xác nhận" },
-    { id: "Đang chuẩn bị hàng", label: "Đang chuẩn bị hàng" },
-    { id: "Đang giao", label: "Đang giao" },
-    { id: "Hoàn thành", label: "Hoàn thành" },
-    { id: "Yêu cầu hoàn", label: "Yêu cầu hoàn" },
-    { id: "Hoàn hàng", label: "Hoàn hàng" },
-    { id: "Hủy hàng", label: "Hủy hàng" },
-  ];
+  const ORDER_STATUS_LABELS = {
+    CHO_XAC_NHAN: "Chờ xác nhận",
+    DANG_CHUAN_BI_HANG: "Đang chuẩn bị hàng",
+    DANG_GIAO: "Đang giao",
+    HOAN_THANH: "Hoàn thành",
+    YEU_CAU_HOAN: "Yêu cầu hoàn",
+    HOAN_HANG: "Hoàn hàng",
+    HUY_HANG: "Hủy hàng",
+  };
+
+  const tabs = useMemo(() => {
+    return [
+      { id: "all", label: "Tất cả" },
+      ...Object.entries(ORDER_STATUS_LABELS).map(([key, value]) => ({
+        id: key,
+        label: value,
+      })),
+    ];
+  }, []);
+
   const filteredOrders = useMemo(() => {
     const sorted = [...(orders || [])].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
     return activeTab === "all"
       ? sorted
-      : sorted.filter((order) => order.order_status === activeTab);
+      : sorted.filter((order) => order.orderStatus === activeTab);
   }, [orders, activeTab]);
 
   useEffect(() => {
@@ -58,19 +68,17 @@ const OrderStatusPage = () => {
 
   const confirmCancelOrder = async () => {
     if (selectedOrder) {
-      const result = await handleUpdateOrderStatus(selectedOrder, "Hủy hàng");
+      const result = await handleUpdateOrderStatus(selectedOrder, "HUY_HANG");
+      console.log("re", result);
       if (result.EC === 0) {
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
-            order._id === selectedOrder
-              ? { ...order, order_status: "Hủy hàng" }
+            order.id === selectedOrder
+              ? { ...order, orderStatus: "HUY_HANG" }
               : order
           )
         );
-        if (
-          result.result.order_payment_method === "Paypal" &&
-          result.result.is_paid
-        )
+        if (result.result.orderPaymentMethod === "PAYPAL" && result.result.isPaid)
           showPopup(result.EM);
         else showPopup("Hủy đơn hàng thành công");
       } else showPopup(result.EM, false);
@@ -83,13 +91,13 @@ const OrderStatusPage = () => {
     if (selectedOrder) {
       const result = await handleUpdateOrderStatus(
         selectedOrder,
-        "Yêu cầu hoàn"
+        "YEU_CAU_HOAN"
       );
       if (result.EC === 0) {
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
-            order._id === selectedOrder
-              ? { ...order, order_status: "Yêu cầu hoàn" }
+            order.id === selectedOrder
+              ? { ...order, orderStatus: "YEU_CAU_HOAN" }
               : order
           )
         );
@@ -102,12 +110,12 @@ const OrderStatusPage = () => {
 
   const confirmCancelRequireRefund = async () => {
     if (selectedOrder) {
-      const result = await handleUpdateOrderStatus(selectedOrder, "Hoàn thành");
+      const result = await handleUpdateOrderStatus(selectedOrder, "HOAN_THANH");
       if (result.EC === 0) {
         setOrders((prevOrders) =>
           prevOrders.map((order) =>
-            order._id === selectedOrder
-              ? { ...order, order_status: "Hoàn thành" }
+            order.id === selectedOrder
+              ? { ...order, orderStatus: "HOAN_THANH" }
               : order
           )
         );
@@ -120,23 +128,23 @@ const OrderStatusPage = () => {
 
   // Hàm tìm giá variant và hình ảnh dựa vào màu sắc và kích thước
   const findProductDetails = (product) => {
-    const colorOption = product.product_id?.colors.find(
-      (c) => c.color_name === product.color
+    const colorOption = product.product?.colors.find(
+      (c) => c.colorName === product.colorName
     );
 
-    let variantPrice = product.product_id?.product_price;
-    let productImage = product.product_id?.product_img;
+    let variantPrice = product.product?.productPrice;
+    let productImage = product.product?.productImg;
 
     if (colorOption) {
-      productImage = colorOption.imgs.img_main;
+      productImage = colorOption.imgs.imgMain;
 
       // Tìm biến thể tương ứng
       const variantOption = colorOption.variants.find(
-        (v) => v.variant_size === product.variant
+        (v) => v.variantSize === product.variantName
       );
 
       if (variantOption) {
-        variantPrice = variantOption.variant_price;
+        variantPrice = variantOption.variantPrice;
       }
     }
 
@@ -144,11 +152,11 @@ const OrderStatusPage = () => {
   };
 
   const handleProductClick = (order) => {
-    navigate(`order-details/${order._id}`);
+    navigate(`order-details/${order.id}`);
   };
 
   const handleFeedback = (order) => {
-    navigate(`order-feedback/${order._id}`);
+    navigate(`order-feedback/${order.id}`);
   };
 
   return (
@@ -191,18 +199,18 @@ const OrderStatusPage = () => {
               className="p-4 my-5 border border-gray-300 rounded-md"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm font-semibold text-end sm:text-start gap-1 sm:gap-4">
-                <p className="uppercase">{order.order_status}</p>
+                <p className="uppercase">
+                  {ORDER_STATUS_LABELS[order.orderStatus] || order.orderStatus}
+                </p>
                 <p className="uppercase">
                   <span
-                    className={
-                      order.is_paid ? "text-green-600" : "text-red-600"
-                    }
+                    className={order.isPaid ? "text-green-600" : "text-red-600"}
                   >
-                    {order.order_status === "Hoàn hàng"
+                    {order.orderStatus === "HOAN_HANG"
                       ? "Đã hoàn tiền"
-                      : `${
-                          order.is_paid ? "Đã thanh toán" : "Chưa thanh toán"
-                        } (${order.order_payment_method})`}
+                      : `${order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"} (${
+                          order.orderPaymentMethod
+                        })`}
                   </span>
                 </p>
               </div>
@@ -210,12 +218,11 @@ const OrderStatusPage = () => {
                 const { variantPrice, productImage } =
                   findProductDetails(product);
                 const discountedPrice =
-                  product.product_id?.product_percent_discount > 0
+                  product.product?.productPercentDiscount > 0
                     ? (variantPrice *
-                        (100 - product.product_id?.product_percent_discount)) /
+                        (100 - product.product?.productPercentDiscount)) /
                       100
                     : variantPrice;
-
                 return (
                   <div
                     key={index}
@@ -224,21 +231,21 @@ const OrderStatusPage = () => {
                   >
                     <img
                       src={productImage}
-                      alt={product.product_id?.product_title}
+                      alt={product.product?.productTitle}
                       className="w-16 h-16 object-cover border border-gray-300 rounded"
                     />
                     <div className="flex-1">
                       <p className="text-sm font-semibold line-clamp-2">
-                        {product.product_id?.product_title}
+                        {product.product?.productTitle}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {product.color} - {product.variant}
+                        {product.colorName} - {product.variantName}
                       </p>
                       <p className="text-sm">x{product.quantity}</p>
                     </div>
                     <div className="flex space-x-2">
                       {discountedPrice &&
-                        product.product_id?.product_percent_discount > 0 && (
+                        product.product?.productPercentDiscount > 0 && (
                           <p className="text-[#9ca3af] line-through">
                             {discountedPrice?.toLocaleString()}đ
                           </p>
@@ -253,20 +260,20 @@ const OrderStatusPage = () => {
               <div className="flex justify-end space-x-4">
                 <p className="font-medium">Thành tiền:</p>
                 <p className="font-bold text-[#ba2b20]">
-                  {order.order_total_final?.toLocaleString()}đ
+                  {order.orderTotalFinal?.toLocaleString()}đ
                 </p>
               </div>
 
               <div className="mt-4 text-right space-x-2">
-                {order.order_status === "Hoàn thành" && (
+                {order.orderStatus === "HOAN_THANH" && (
                   <>
-                    {!order.is_require_refund && (
+                    {!order.isRequireRefund && (
                       <Button
                         variant="filled"
                         color="blue"
                         className="w-[120px] h-[30px] sm:w-[150px] sm:h-[40px] rounded font-medium"
                         onClick={() => {
-                          const receivedDate = new Date(order.received_date);
+                          const receivedDate = new Date(order.receivedDate);
                           const now = new Date();
                           const diffInDays = Math.floor(
                             (now - receivedDate) / (1000 * 60 * 60 * 24)
@@ -278,7 +285,7 @@ const OrderStatusPage = () => {
                               false
                             );
                           } else {
-                            setSelectedOrder(order._id);
+                            setSelectedOrder(order.id);
                             setOpenRequireRefundDialog(true);
                           }
                         }}
@@ -286,7 +293,7 @@ const OrderStatusPage = () => {
                         Yêu cầu hoàn
                       </Button>
                     )}
-                    {!order.is_feedback && (
+                    {!order.isFeedback && (
                       <Button
                         variant="filled"
                         color="black"
@@ -310,20 +317,20 @@ const OrderStatusPage = () => {
                     </Button>
                   </>
                 )}
-                {order.order_status === "Yêu cầu hoàn" && (
+                {order.orderStatus === "YEU_CAU_HOAN" && (
                   <Button
                     variant="filled"
                     color="black"
                     className="w-[100px] h-[30px] sm:w-[150px] sm:h-[40px] rounded font-medium border transition duration-200 bg-yellow-100 text-yellow-700 border-yellow-400 hover:brightness-110"
                     onClick={() => {
-                      setSelectedOrder(order._id);
+                      setSelectedOrder(order.id);
                       setOpenCancelRequireRefundDialog(true);
                     }}
                   >
                     Hủy yêu cầu
                   </Button>
                 )}
-                {order.order_status === "Hủy hàng" && (
+                {order.orderStatus === "HUY_HANG" && (
                   <>
                     <Button
                       variant="filled"
@@ -339,7 +346,7 @@ const OrderStatusPage = () => {
                     </Button>
                   </>
                 )}
-                {order.order_status === "Hoàn hàng" && (
+                {order.orderStatus === "HOAN_HANG" && (
                   <Button
                     variant="filled"
                     color="black"
@@ -353,10 +360,10 @@ const OrderStatusPage = () => {
                     Mua lại
                   </Button>
                 )}
-                {order.order_status === "Chờ xác nhận" && (
+                {order.orderStatus === "CHO_XAC_NHAN" && (
                   <div className="flex flex-wrap gap-2 justify-end">
-                    {!order.is_paid &&
-                      order.order_payment_method === "Paypal" &&
+                    {!order.isPaid &&
+                      order.orderPaymentMethod === "PAYPAL" &&
                       order.checkoutUrl && (
                         <Button
                           variant="filled"
@@ -384,7 +391,7 @@ const OrderStatusPage = () => {
                       color="black"
                       className="w-[100px] h-[30px] sm:w-[150px] sm:h-[40px] text-white !bg-black rounded font-medium"
                       onClick={() => {
-                        setSelectedOrder(order._id);
+                        setSelectedOrder(order.id);
                         setOpenCancelDialog(true);
                       }}
                     >

@@ -8,6 +8,16 @@ const OrderDetailsPage = () => {
   const { fetchOrderDetail, orderDetails } = useOrder();
   const { showPopup } = usePopup();
 
+  const ORDER_STATUS_LABELS = {
+    CHO_XAC_NHAN: "Chờ xác nhận",
+    DANG_CHUAN_BI_HANG: "Đang chuẩn bị hàng",
+    DANG_GIAO: "Đang giao",
+    HOAN_THANH: "Hoàn thành",
+    YEU_CAU_HOAN: "Yêu cầu hoàn",
+    HOAN_HANG: "Hoàn hàng",
+    HUY_HANG: "Hủy hàng",
+  };
+
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const code = query.get("code");
@@ -32,23 +42,23 @@ const OrderDetailsPage = () => {
 
   // Hàm tìm giá variant và hình ảnh dựa vào màu sắc và kích thước
   const findProductDetails = (product) => {
-    const colorOption = product.product_id.colors.find(
-      (c) => c.color_name === product.color
+    const colorOption = product?.product?.colors.find(
+      (c) => c.colorName === product.colorName
     );
 
-    let variantPrice = product.product_id.product_price;
-    let productImage = product.product_id.product_img;
+    let variantPrice = product.product?.productPrice;
+    let productImage = product.product?.productImg;
 
     if (colorOption) {
-      productImage = colorOption.imgs.img_main;
+      productImage = colorOption.imgs?.imgMain;
 
       // Tìm biến thể tương ứng
       const variantOption = colorOption.variants.find(
-        (v) => v.variant_size === product.variant
+        (v) => v.variantSize === product.variantName
       );
 
       if (variantOption) {
-        variantPrice = variantOption.variant_price;
+        variantPrice = variantOption.variantPrice;
       }
     }
 
@@ -59,7 +69,7 @@ const OrderDetailsPage = () => {
     <div className="xl:max-w-[1200px] container mx-auto py-10 px-2">
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold uppercase mb-4">Chi tiết đơn hàng</h1>
-        <p className="text-sm font-semibold">{orderDetails?.order_status}</p>
+        <p className="text-sm font-semibold">{ORDER_STATUS_LABELS[orderDetails?.orderStatus]}</p>
       </div>
       <div className="bg-[#f6f6f6] rounded-lg mb-4 p-5 space-y-2">
         <h3 className="text-lg uppercase font-semibold">Thông tin nhận hàng</h3>
@@ -67,22 +77,22 @@ const OrderDetailsPage = () => {
           <strong className="text-sm inline-block font-semibold min-w-[100px]">
             Người nhận:{" "}
           </strong>
-          {orderDetails?.shipping_address?.name}
+          {orderDetails?.shippingAddress?.name}
         </p>
         <p>
           <strong className="text-sm inline-block font-semibold min-w-[100px]">
             Số điện thoại:{" "}
           </strong>
-          {orderDetails?.shipping_address?.phone}
+          {orderDetails?.shippingAddress?.phone}
         </p>{" "}
         <p>
           <strong className="text-sm inline-block font-semibold min-w-[100px]">
             Địa chỉ:{" "}
           </strong>
-          {orderDetails?.shipping_address?.home_address},{" "}
-          {orderDetails?.shipping_address?.ward},{" "}
-          {orderDetails?.shipping_address?.district},{" "}
-          {orderDetails?.shipping_address?.province}
+          {orderDetails?.shippingAddress?.homeAddress},{" "}
+          {orderDetails?.shippingAddress?.ward},{" "}
+          {orderDetails?.shippingAddress?.district},{" "}
+          {orderDetails?.shippingAddress?.province}
         </p>
       </div>
       <div className="bg-[#f6f6f6] rounded-lg mb-4 p-5 space-y-2">
@@ -93,17 +103,17 @@ const OrderDetailsPage = () => {
           <strong className="text-sm inline-block font-semibold min-w-[100px]">
             Thanh toán:{" "}
           </strong>
-          {orderDetails?.order_payment_method === "Cod"
+          {orderDetails?.orderPaymentMethod === "COD"
             ? "Thanh toán khi nhận hàng"
-            : orderDetails?.order_payment_method}
+            : orderDetails?.orderPaymentMethod}
         </p>
         <p>
           <strong className="text-sm inline-block font-semibold min-w-[100px]">
             Trạng thái:{" "}
           </strong>
-          {orderDetails?.order_status === "Hoàn hàng"
+          {orderDetails?.orderStatus === "HOAN HANG"
             ? "Đã hoàn tiền"
-            : orderDetails?.is_paid
+            : orderDetails?.isPaid
             ? "Đã thanh toán"
             : "Chưa thanh toán"}
         </p>
@@ -131,9 +141,9 @@ const OrderDetailsPage = () => {
         {orderDetails?.products.map((product, index) => {
           const { variantPrice, productImage } = findProductDetails(product);
           const discountedPrice =
-            product.product_id.product_percent_discount > 0
+            product.product?.productPercentDiscount > 0
               ? (variantPrice *
-                  (100 - product.product_id.product_percent_discount)) /
+                  (100 - product.product?.productPercentDiscount)) /
                 100
               : variantPrice;
 
@@ -141,26 +151,26 @@ const OrderDetailsPage = () => {
             <div key={index} className="flex items-center gap-4 py-4 last:mb-0">
               <img
                 src={productImage}
-                alt={product.product_id.product_title}
+                alt={product.product?.productTitle}
                 className="w-16 h-16 object-cover border border-gray-300 rounded"
               />
               <div className="flex-1">
                 <p className="text-sm font-semibold line-clamp-1">
-                  {product.product_id.product_title}
+                  {product.product?.productTitle}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {product.color} - {product.variant}
+                  {product.colorName} - {product.variantName}
                 </p>
                 <p className="text-sm">x{product.quantity}</p>
               </div>
               <div className="flex space-x-2">
-                {product.product_id.product_percent_discount > 0 && (
+                {product.product?.productPercentDiscount > 0 && (
                   <p className="text-[#9ca3af] line-through">
-                    {variantPrice.toLocaleString()}đ
+                    {variantPrice?.toLocaleString()}đ
                   </p>
                 )}
                 <p className="font-medium text-[#ba2b20]">
-                  {discountedPrice.toLocaleString()}đ
+                  {discountedPrice?.toLocaleString()}đ
                 </p>
               </div>
             </div>
@@ -169,7 +179,7 @@ const OrderDetailsPage = () => {
         <div className="flex justify-end space-x-4">
           <p className="font-medium">Tổng tiền:</p>
           <p className="font-bold text-[#ba2b20]">
-            {orderDetails?.order_total_final.toLocaleString()}đ
+            {orderDetails?.orderTotalFinal?.toLocaleString()}đ
           </p>
         </div>
       </div>

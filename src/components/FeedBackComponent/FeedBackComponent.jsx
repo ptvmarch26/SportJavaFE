@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { IoIosStar } from "react-icons/io";
+import avt_false from "../../assets/images/avatar-false.jpg";
 
 const FeedbackComponent = ({ feedback }) => {
   const {
@@ -7,11 +8,11 @@ const FeedbackComponent = ({ feedback }) => {
     content,
     color,
     variant,
-    feedback_media = {},
+    feedbackMedia = {},
     createdAt,
   } = feedback;
 
-  const { images = [], videos = [] } = feedback_media;
+  const { images = [], videos = [] } = feedbackMedia;
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewContent, setPreviewContent] = useState(null);
@@ -29,6 +30,8 @@ const FeedbackComponent = ({ feedback }) => {
     setPreviewContent(null);
   };
 
+  console.log("fb", feedback);
+
   return (
     <div className="border-t border-gray-200 py-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -36,13 +39,11 @@ const FeedbackComponent = ({ feedback }) => {
           <div>
             <div className="flex gap-2 items-center">
               <img
-                src={feedback.user_id.avt_img}
+                src={feedback?.user?.avtimg || avt_false}
                 alt="avatar"
                 className="w-8 h-8 rounded-full"
               />
-              <p className="font-medium text-base">
-                {feedback.user_id?.user_name}
-              </p>
+              <p className="font-medium text-base">{feedback.user?.username}</p>
             </div>
           </div>
           <div className="flex items-center">
