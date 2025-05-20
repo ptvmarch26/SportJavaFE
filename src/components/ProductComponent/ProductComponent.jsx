@@ -16,8 +16,8 @@ const ProductComponent = ({ item, favourites, onFavouriteChange, onClick }) => {
 
   useEffect(() => {
     const savedCompare = JSON.parse(localStorage.getItem("compareList")) || [];
-    setIsCompared(savedCompare.includes(item._id));
-  }, [item._id]);
+    setIsCompared(savedCompare.includes(item.id));
+  }, [item.id]);
 
   const toggleCompare = async (e) => {
     e.stopPropagation();
@@ -26,25 +26,25 @@ const ProductComponent = ({ item, favourites, onFavouriteChange, onClick }) => {
     if (savedCompare.length > 0) {
       const compareItem = await fetchProductDetails(savedCompare[0]);
       if (
-        compareItem.product_category.category_type !==
-          item.product_category.category_type ||
-        compareItem.product_category.category_gender !==
-          item.product_category.category_gender
+        compareItem.productCategory.categoryType !==
+          item.productCategory.categoryType ||
+        compareItem.productCategory.categoryGender !==
+          item.productCategory.categoryGender
       ) {
         showPopup("Bạn chỉ có thể so sánh 2 sản phẩm cùng loại", false);
         return;
       }
     }
 
-    if (savedCompare.includes(item._id)) {
-      savedCompare = savedCompare.filter((id) => id !== item._id);
+    if (savedCompare.includes(item.id)) {
+      savedCompare = savedCompare.filter((id) => id !== item.id);
       setIsCompared(false);
     } else {
       if (savedCompare.length >= 2) {
         showPopup("Chỉ được so sánh tối đa 2 sản phẩm", false);
         return;
       }
-      savedCompare.push(item._id);
+      savedCompare.push(item.id);
       setIsCompared(true);
     }
 
@@ -56,13 +56,13 @@ const ProductComponent = ({ item, favourites, onFavouriteChange, onClick }) => {
     const handleCompareListUpdate = () => {
       const savedCompare =
         JSON.parse(localStorage.getItem("compareList")) || [];
-      setIsCompared(savedCompare.includes(item._id));
+      setIsCompared(savedCompare.includes(item.id));
     };
 
     window.addEventListener("compareListUpdated", handleCompareListUpdate);
     return () =>
       window.removeEventListener("compareListUpdated", handleCompareListUpdate);
-  }, [item._id]);
+  }, [item.id]);
 
   const toggleFavorite = async (e) => {
     if (!token) {

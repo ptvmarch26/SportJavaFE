@@ -34,7 +34,8 @@ const Header = () => {
   const [searchHistory, setSearchHistory] = useState([]);
   const [displayAllHistory, setDisplayAllHistory] = useState(false);
   const [fullSearchHistory, setFullSearchHistory] = useState([]);
-  const { selectedUser, fetchUser, handleDeleteSearch } = useUser();
+  const { selectedUser, fetchUser, handleDeleteSearch, setSelectedUser } =
+    useUser();
   const { cart, fetchCart } = useCart();
   const { unreadCount } = useNotifications();
   const { token } = useAuth();
@@ -317,6 +318,7 @@ const Header = () => {
 
   const handleSubmitLogout = async () => {
     await handleLogout();
+    setSelectedUser(null);
     localStorage.removeItem("compareList");
     window.dispatchEvent(new CustomEvent("compareListUpdated"));
     navigate("/", { replace: true });
