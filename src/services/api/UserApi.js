@@ -75,6 +75,7 @@ export const deleteAddress = async (index) => {
 export const getDiscount = async () => {
   try {
     const response = await AxiosInstance.get("/user/get-discount");
+    console.log("aaaa", response)
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";

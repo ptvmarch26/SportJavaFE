@@ -40,6 +40,9 @@ const OrderDetailsPage = () => {
     fetchOrderDetail(id);
   }, [id]);
 
+  console.log("id", id);
+  console.log("or", orderDetails)
+
   // Hàm tìm giá variant và hình ảnh dựa vào màu sắc và kích thước
   const findProductDetails = (product) => {
     const colorOption = product?.product?.colors.find(

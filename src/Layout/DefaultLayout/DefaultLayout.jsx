@@ -92,7 +92,7 @@ const DefaultLayout = ({ children }) => {
     localStorage.setItem("compareList", JSON.stringify(compareList));
 
     setCompareProducts((prev) =>
-      prev.filter((product) => product._id !== productId)
+      prev.filter((product) => product.id !== productId)
     );
     setCompareCount(compareList.length);
 
@@ -110,7 +110,7 @@ const DefaultLayout = ({ children }) => {
 
     // Lấy ảnh từ biến thể
     product.colors?.forEach((color) => {
-      images.push(color?.imgs?.img_main);
+      images.push(color?.imgs?.imgMain);
     });
 
     // Lọc bỏ ảnh null hoặc undefined
@@ -175,17 +175,17 @@ const DefaultLayout = ({ children }) => {
                 <div className="grid grid-cols-2 gap-6">
                   {compareProducts.map((product) => (
                     <div
-                      key={product._id}
+                      key={product.id}
                       className="border rounded-lg overflow-hidden"
                     >
                       <div className="relative h-64">
                         <img
-                          src={product.product_img}
-                          alt={product.product_title}
+                          src={product.productImg}
+                          alt={product.productTitle}
                           className="w-full h-full object-cover"
                         />
                         <button
-                          onClick={() => removeFromCompare(product._id)}
+                          onClick={() => removeFromCompare(product.id)}
                           className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
                         >
                           <IoClose size={20} />
@@ -193,18 +193,18 @@ const DefaultLayout = ({ children }) => {
                       </div>
                       <div className="p-4">
                         <h3 className="font-bold text-lg mb-2 min-h-[70px] sm:min-h-[56px]">
-                          {product.product_title}
+                          {product.productTitle}
                         </h3>
                         <div className="mb-2">
                           <span className="text-base font-bold text-[#ba2b20]">
-                            {product.product_price.toLocaleString()}đ
+                            {product.productPrice?.toLocaleString()}đ
                           </span>
-                          {product.product_percent_discount > 0 && (
+                          {product.productPercentDiscount > 0 && (
                             <span className="ml-2 text-sm line-through text-gray-400">
                               {(
-                                product.product_price /
-                                (1 - product.product_percent_discount / 100)
-                              ).toLocaleString()}
+                                product.productPrice /
+                                (1 - product.productPercentDiscount / 100)
+                              )?.toLocaleString()}
                               đ
                             </span>
                           )}
@@ -229,7 +229,7 @@ const DefaultLayout = ({ children }) => {
                           <div className="flex items-center gap-2">
                             <IoIosStar className="text-yellow-400 text-xl" />
                             <p className="text-base font-semibold">
-                              {product.product_rate}
+                              {product.productRate}
                             </p>
                           </div>
                         </div>
@@ -237,7 +237,7 @@ const DefaultLayout = ({ children }) => {
                         <div className="border-t pt-2 mt-2">
                           <p className="font-semibold mb-1">Mô tả:</p>
                           <p className="text-sm line-clamp-4">
-                            {product.product_description}
+                            {product.productDescription}
                           </p>
                         </div>
                       </div>

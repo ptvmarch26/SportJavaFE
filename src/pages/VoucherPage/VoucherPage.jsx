@@ -4,21 +4,19 @@ import voucherShipping from "../../assets/images/voucher_shipping.png";
 import voucherProduct from "../../assets/images/voucher_product.png";
 import { useUser } from "../../context/UserContext";
 
-
-
 const VoucherCard = ({ voucher, image }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex gap-4">
       <img
         src={image}
-        alt={voucher.discount_title}
+        alt={voucher.discountTitle}
         className="w-28 h-28 object-cover rounded-md border mb-3 bg-gray-600 p-2"
       />
       <div className="space-y-2">
         <p className="text-lg">
-          <span className="font-bold">{voucher.discount_code}</span>
+          <span className="font-bold">{voucher.discountCode}</span>
         </p>
-        <p className="line-clamp-1 md:line-clamp-2">{voucher.discount_title}</p>
+        <p className="line-clamp-1 md:line-clamp-2">{voucher.discountTitle}</p>
         <p className="line-clamp-1 md:line-clamp-2">{voucher.description}</p>
       </div>
     </div>
@@ -31,8 +29,10 @@ const VoucherPage = () => {
     handleGetDiscount();
   }, []);
 
-  const shippingVouchers = discounts.filter((v) => v.discount_type === "shipping");
-  const productVouchers = discounts.filter((v) => v.discount_type === "product");
+  const shippingVouchers = discounts.filter(
+    (v) => v.discountType === "SHIPPING"
+  );
+  const productVouchers = discounts.filter((v) => v.discountType === "PRODUCT");
 
   const shippingImage = voucherShipping;
 
@@ -49,7 +49,11 @@ const VoucherPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-5">
             {productVouchers.length > 0 ? (
               productVouchers.map((voucher, index) => (
-                <VoucherCard key={index} voucher={voucher} image={productImage} />
+                <VoucherCard
+                  key={index}
+                  voucher={voucher}
+                  image={productImage}
+                />
               ))
             ) : (
               <p className="text-gray-500">Bạn không có mã giảm giá sản phẩm</p>
@@ -59,10 +63,16 @@ const VoucherPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-5">
             {shippingVouchers.length > 0 ? (
               shippingVouchers.map((voucher, index) => (
-                <VoucherCard key={index} voucher={voucher} image={shippingImage} />
+                <VoucherCard
+                  key={index}
+                  voucher={voucher}
+                  image={shippingImage}
+                />
               ))
             ) : (
-              <p className="text-gray-500">Bạn không có mã giảm giá vận chuyển</p>
+              <p className="text-gray-500">
+                Bạn không có mã giảm giá vận chuyển
+              </p>
             )}
           </div>
         </div>
