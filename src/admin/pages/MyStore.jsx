@@ -24,7 +24,6 @@ const MyStore = () => {
   useEffect(() => {
     const fetchStore = async () => {
       const res = await getDetailStore(storeId);
-      console.log("res", res);
       if (res.EC === 0 && res.EM) {
         const { storeAddress, storeEmail, storePhone, storeBanner } =
           res.result;

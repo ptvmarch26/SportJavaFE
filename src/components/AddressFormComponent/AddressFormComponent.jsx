@@ -14,11 +14,11 @@ function AddressFormComponent({
   const fieldNames = {
     name: "Họ và tên",
     phone: "Số điện thoại",
-    home_address: "Địa chỉ",
+    homeAddress: "Địa chỉ",
     province: "Tỉnh/Thành phố",
     district: "Quận/Huyện",
     ward: "Phường/Xã",
-    is_default: "false",
+    isDefault: "false",
   };
 
   const [provinces, setProvinces] = useState([]);
@@ -229,13 +229,13 @@ function AddressFormComponent({
         <input
           id="home_address"
           type="text"
-          value={newAddress.home_address}
+          value={newAddress.homeAddress}
           onChange={(e) =>
-            setNewAddress({ ...newAddress, home_address: e.target.value })
+            setNewAddress({ ...newAddress, homeAddress: e.target.value })
           }
-          onBlur={() => handleBlur("home_address")}
+          onBlur={() => handleBlur("homeAddress")}
           className={`peer w-full p-2 border rounded focus:ring-black placeholder-transparent ${
-            formErrors.home_address ? "border-red-500" : "border-gray-300"
+            formErrors.homeAddress ? "border-red-500" : "border-gray-300"
           }`}
           placeholder="Địa chỉ cụ thể"
         />
@@ -245,8 +245,8 @@ function AddressFormComponent({
         >
           Địa chỉ cụ thể
         </label>
-        {formErrors.home_address && (
-          <p className="text-red-500 text-xs mt-1">{formErrors.home_address}</p>
+        {formErrors.homeAddress && (
+          <p className="text-red-500 text-xs mt-1">{formErrors.homeAddress}</p>
         )}
       </div>
     </div>

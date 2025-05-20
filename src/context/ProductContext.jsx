@@ -19,7 +19,6 @@ export const ProductProvider = ({ children }) => {
 
   const fetchProductDetails = async (productId) => {
     const res = await getDetailsProduct(productId);
-    console.log("prdt", res);
     if (res?.EC === 0) {
         setProductDetails(res.result);
     } else {

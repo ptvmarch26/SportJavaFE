@@ -85,15 +85,15 @@ const AccountInfoComponent = () => {
         <label>
           <img
             className="w-20 h-20 rounded-full object-cover shadow-md"
-            src={selectedUser?.avt_img || defaultAvatar}
+            src={selectedUser?.avtimg || defaultAvatar}
             alt="avatar"
           />
         </label>
         <h2 className="text-lg font-semibold mt-3 text-gray-800 truncate overflow-hidden whitespace-nowrap w-full text-center">
-          {selectedUser?.full_name || "Chưa cập nhật"}
+          {selectedUser?.fullName || "Chưa cập nhật"}
         </h2>
         <p className="text-gray-500 text-sm truncate overflow-hidden whitespace-nowrap w-full text-center">
-          {selectedUser?.user_name || "Chưa cập nhật"}
+          {selectedUser?.username || "Chưa cập nhật"}
         </p>
       </div>
 

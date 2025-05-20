@@ -23,15 +23,15 @@ export const UserProvider = ({ children }) => {
   const { token } = useAuth();
   const fetchUsers = async () => {
       const data = await getAllUsers();
-
       if (
         data?.EC === 0 &&
         Array.isArray(data.result)
       ) {
         const processedUsers = data.result.map((user) => ({
           ...user,
-          status: user.deleted_at ? "Đã khóa" : "Hoạt động",
+          status: user.deletedAt ? "Đã khóa" : "Hoạt động",
         }));
+
         return processedUsers;
       } else {
         message.error("Không thể tải danh sách người dùng!");

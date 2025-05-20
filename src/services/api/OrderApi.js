@@ -57,7 +57,7 @@ export const updateOrderStatus = async (orderId, status) => {
 
 export const handleCancelPayment = async (orderCode) => {
   try {
-    const response = await AxiosInstance.patch(
+    const response = await AxiosInstance.put(
       `/order/handle-cancel-payment/${orderCode}`
     );
     return response.data;
@@ -68,9 +68,7 @@ export const handleCancelPayment = async (orderCode) => {
 
 export const getRevenue = async (year) => {
   try {
-    const response = await AxiosInstance.get(
-      `/order/get-revenue/?year=${year}`
-    );
+    const response = await AxiosInstance.get(`/order/get-revenue?year=${year}`);
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";

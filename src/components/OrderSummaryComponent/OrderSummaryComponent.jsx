@@ -8,7 +8,7 @@ const OrderSummaryComponent = ({
   onClick,
   handleApplyVoucher,
 }) => {
-    const { showPopup } = usePopup();
+  const { showPopup } = usePopup();
   const [vouchers, setVouchers] = useState({
     product: {
       code: "",
@@ -33,20 +33,20 @@ const OrderSummaryComponent = ({
   }, [vouchers]);
 
   const cartDetails = cart.map((item) => {
-    const selectedColor = item?.product_id?.colors?.find(
-      (color) => color.color_name === item.color_name
+    const selectedColor = item?.productId?.colors?.find(
+      (color) => color.colorName === item.colorName
     );
 
     const selectedVariant = selectedColor?.variants?.find(
-      (variant) => variant.variant_size === item.variant_name
+      (variant) => variant.variantSize === item.variantName
     );
 
     const imageToDisplay =
-      selectedVariant?.imgs?.img_main ||
-      selectedColor?.imgs?.img_main ||
-      item?.product_id?.product_img;
+      selectedVariant?.imgs?.imgMain ||
+      selectedColor?.imgs?.imgMain ||
+      item?.productId?.productImg;
 
-    const variantPrice = selectedVariant?.variant_price;
+    const variantPrice = selectedVariant?.variantPrice;
 
     return {
       item,
@@ -68,7 +68,7 @@ const OrderSummaryComponent = ({
     // Giảm giá sản phẩm
     if (vouchers.product.applied && vouchers.product.selectedVoucher) {
       total =
-        total * (1 - vouchers.product.selectedVoucher.discount_number / 100);
+        total * (1 - vouchers.product.selectedVoucher.discountNumber / 100);
     }
 
     let shipping = shippingCost;
@@ -76,8 +76,7 @@ const OrderSummaryComponent = ({
     // Giảm giá vận chuyển
     if (vouchers.shipping.applied && vouchers.shipping.selectedVoucher) {
       shipping =
-        shipping *
-        (1 - vouchers.shipping.selectedVoucher.discount_number / 100);
+        shipping * (1 - vouchers.shipping.selectedVoucher.discountNumber / 100);
     }
 
     setFinalTotal(total + shipping);
@@ -102,7 +101,7 @@ const OrderSummaryComponent = ({
       ...prev,
       [type]: {
         ...prev[type],
-        code: voucher.discount_code,
+        code: voucher.discountCode,
         isValid: true,
         showList: false,
         applied: false,
@@ -116,7 +115,7 @@ const OrderSummaryComponent = ({
     if (type === "product") {
       const foundVoucher = productVouchers.find(
         (voucher) =>
-          voucher.discount_code.toUpperCase() ===
+          voucher.discountCode.toUpperCase() ===
           vouchers.product.code.toUpperCase()
       );
 
@@ -136,7 +135,7 @@ const OrderSummaryComponent = ({
     } else if (type === "shipping") {
       const foundVoucher = shippingVouchers.find(
         (voucher) =>
-          voucher.discount_code.toUpperCase() ===
+          voucher.discountCode.toUpperCase() ===
           vouchers.shipping.code.toUpperCase()
       );
 
@@ -175,17 +174,17 @@ const OrderSummaryComponent = ({
             <div>
               <img
                 src={item?.imageToDisplay}
-                alt={item?.item.product_id?.product_title}
+                alt={item?.item.productId?.productTitle}
                 className="w-16 h-16 object-cover"
               />
             </div>
             <div className="flex justify-between items-center flex-1 mx-4 space-x-2">
               <div>
                 <h4 className="text-sm line-clamp-1">
-                  {item?.item?.product_id?.product_title}
+                  {item?.item.productId?.productTitle}
                 </h4>
                 <p className="text-xs">
-                  {item.item.color_name} - {item.item.variant_name}
+                  {item.item.colorName} - {item.item.variantName}
                 </p>
                 <p className="text-xs">x{item.item.quantity}</p>
               </div>
@@ -251,10 +250,10 @@ const OrderSummaryComponent = ({
                   <div className="flex justify-between items-center">
                     <div className="space-y-2">
                       <p className="text-sm font-medium">
-                        {voucher.discount_code}
+                        {voucher.discountCode}
                       </p>
                       <p className="text-xs">
-                        - {voucher.discount_number}% đơn hàng
+                        - {voucher.discountNumber}% đơn hàng
                       </p>
                     </div>
                     {/* <p className="text-sm text-green-600">{voucher.description}</p> */}
@@ -317,11 +316,11 @@ const OrderSummaryComponent = ({
                   <div className="flex justify-between items-center">
                     <div className="space-y-2">
                       <p className="text-sm font-medium">
-                        {voucher.discount_code}
+                        {voucher.discountCode}
                       </p>
                       <p className="text-xs">
                         {" "}
-                        - {voucher.discount_number}% phí vận chuyển
+                        - {voucher.discountNumber}% phí vận chuyển
                       </p>
                     </div>
                     {/* <p className="text-sm text-green-600">{voucher.discount_number}%</p> */}
@@ -343,7 +342,7 @@ const OrderSummaryComponent = ({
             <span>
               -{" "}
               {(
-                (subtotal * vouchers.product.selectedVoucher.discount_number) /
+                (subtotal * vouchers.product.selectedVoucher.discountNumber) /
                 100
               ).toLocaleString()}
               đ
@@ -361,7 +360,7 @@ const OrderSummaryComponent = ({
               -{" "}
               {(
                 (shippingCost *
-                  vouchers.shipping.selectedVoucher.discount_number) /
+                  vouchers.shipping.selectedVoucher.discountNumber) /
                 100
               ).toLocaleString()}
               đ

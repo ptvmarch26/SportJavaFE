@@ -3,6 +3,7 @@ import { Table, Input, Select, Button, Tag } from "antd";
 import { ExportOutlined } from "@ant-design/icons";
 import { useUser } from "../../context/UserContext";
 const { Option } = Select;
+import avatar_false from "../../assets/images/avatar-false.jpg";
 
 const statusColors = {
   "Hoạt động": "green",
@@ -18,7 +19,7 @@ const Customers = () => {
   useEffect(() => {
     const fetchDataUsers = async () => {
       const user = await fetchUser();
-      if (user.result.role !== "admin") {
+      if (user.result.role !== "ADMIN") {
         window.location.href = "/sign-in";
       } else {
         const usersData = await fetchUsers();
@@ -32,7 +33,7 @@ const Customers = () => {
     ? users.filter((user) => {
         const searchLower = searchText.toLowerCase();
         return (
-          (user.user_name?.toLowerCase().includes(searchLower) ||
+          (user.username?.toLowerCase().includes(searchLower) ||
             user.phone?.includes(searchText) ||
             user.email?.toLowerCase().includes(searchLower)) &&
           (filterStatus ? user.status === filterStatus : true)
@@ -43,21 +44,25 @@ const Customers = () => {
   const columns = [
     {
       title: "Ảnh",
-      dataIndex: "avt_img",
-      key: "avt_img",
+      dataIndex: "avtimg",
+      key: "avtimg",
       render: (image) =>
         image ? (
           <img
-            src={image}
-            alt="Ảnh sản phẩm"
+            src={image || avatar_false}
+            alt="Ảnh đại diện"
             className="w-12 h-12 object-cover rounded-full"
           />
         ) : (
-          "Không có ảnh"
+          <img
+            src={avatar_false}
+            alt="Ảnh đại diện"
+            className="w-12 h-12 object-cover rounded-full"
+          />
         ),
     },
     { title: "Giới tính", dataIndex: "gender", key: "gender" },
-    { title: "Tên người dùng", dataIndex: "user_name", key: "user_name" },
+    { title: "Tên người dùng", dataIndex: "username", key: "username" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Số điện thoại", dataIndex: "phone", key: "phone" },
     {
@@ -100,7 +105,6 @@ const Customers = () => {
           >
             <Option value="Hoạt động">Hoạt động</Option>
             <Option value="Đã khóa">Đã khóa</Option>
-            <Option value="Mới">Mới</Option>
           </Select>
         </div>
       </div>
@@ -110,7 +114,7 @@ const Customers = () => {
           dataSource={filteredUsers}
           columns={columns}
           pagination={{ pageSize: 8 }}
-          rowKey="_id"
+          rowKey="id"
           className="rounded-none"
           scroll={{ x: "max-content" }}
         />

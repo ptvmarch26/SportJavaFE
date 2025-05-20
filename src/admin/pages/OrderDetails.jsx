@@ -14,6 +14,16 @@ const statusColors = {
   "Hủy hàng": "red",
 };
 
+const statusLabel = {
+  CHO_XAC_NHAN: "Chờ xác nhận",
+  DANG_CHUAN_BI: "Đang chuẩn bị hàng",
+  DANG_GIAO: "Đang giao",
+  HOAN_THANH: "Hoàn thành",
+  YEU_CAU_HOAN: "Yêu cầu hoàn",
+  HOAN_HANG: "Hoàn hàng",
+  HUY_HANG: "Hủy hàng",
+};
+
 const OrderDetails = () => {
   const { id } = useParams();
   const { orderDetails, fetchOrderDetail } = useOrder();
@@ -22,8 +32,8 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchData = async () => {
       const order = await fetchOrderDetail(id);
-      if (order.order_payment_method === "Paypal" && order.is_paid) {
-        const res = await getPaymentInfoByOrderCode(order.order_code);
+      if (order.orderPaymentMethod === "PAYPAL" && order.isPaid) {
+        const res = await getPaymentInfoByOrderCode(order.orderCode);
         if (res.EC === 0 && res.result.transactions) {
           setPaymentInfo(res.result);
         }
@@ -35,43 +45,44 @@ const OrderDetails = () => {
   if (!orderDetails) {
     return (
       <p className="lg:ml-[300px] mt-[64px] px-2 py-4 lg:p-6 min-h-screen text-gray-500">
-        Loading...
+        Đang tải dữ liệu đơn hàng...
       </p>
     );
   }
 
   const {
     createdAt,
-    order_status,
-    order_total_price,
-    order_total_final,
-    delivery_fee,
-    order_payment_method,
-    order_total_discount,
-    order_note,
-    estimated_delivery_date,
+    orderStatus,
+    orderTotalPrice,
+    orderTotalFinal,
+    deliveryFee,
+    orderPaymentMethod,
+    orderTotalDiscount,
+    orderNote,
+    estimatedDeliveryDate,
     products,
-    received_date,
-    shipping_address,
-    is_feedback,
+    receivedDate,
+    shippingAddress,
   } = orderDetails;
 
+  console.log("ỏ", orderDetails);
+
   const formattedProducts = products.map((product) => {
-    const colorData = product.product_id.colors.find(
-      (color) => color.color_name === product.color
+    const colorData = product.product?.colors.find(
+      (color) => color.colorName === product.colorName
     );
 
     const variantData = colorData?.variants.find(
-      (variant) => variant.variant_size === product.variant
+      (variant) => variant.variantSize === product.variantName
     );
 
     return {
-      product_id: product.product_id._id,
-      product_name: product.product_id.product_title,
-      product_img: colorData?.imgs?.img_main || product.product_id.product_img,
-      product_price: variantData.variant_price,
+      product_id: product.productId,
+      product_name: product.product?.productTitle,
+      product_img: colorData?.imgs?.imgMain || product.product?.productImg,
+      product_price: variantData?.variantPrice,
       quantity: product.quantity,
-      variant: `${product.color} - ${product.variant}`,
+      variant: `${product.colorName} - ${product.variantName}`,
     };
   });
 
@@ -110,7 +121,7 @@ const OrderDetails = () => {
       dataIndex: "product_price",
       key: "product_price",
       align: "left",
-      render: (price) => `${price.toLocaleString()}`,
+      render: (price) => `${price?.toLocaleString()}`,
     },
     {
       title: "Số lượng",
@@ -123,11 +134,11 @@ const OrderDetails = () => {
       key: "total",
       align: "left",
       render: (_, record) =>
-        `${(record.product_price * record.quantity).toLocaleString()}`,
+        `${(record.product_price * record.quantity)?.toLocaleString()}`,
     },
   ];
 
-  console.log("paymentInfo", paymentInfo)
+  console.log("paymentInfo", paymentInfo);
 
   return (
     <div className="lg:ml-[300px] mt-[64px] px-2 py-4 lg:p-6 min-h-screen bg-gray-100">
@@ -136,12 +147,12 @@ const OrderDetails = () => {
           <strong>Ngày mua hàng:</strong> {new Date(createdAt).toLocaleString()}
         </p>
         <p>
-          <strong>Thanh toán:</strong> {order_payment_method.toUpperCase()}
+          <strong>Thanh toán:</strong> {orderPaymentMethod?.toUpperCase()}
         </p>
         <p>
           <strong>Trạng thái:</strong>{" "}
-          <Tag className="py-1 px-2" color={statusColors[order_status]}>
-            {order_status}
+          <Tag className="py-1 px-2" color={statusColors[orderStatus]}>
+            {statusLabel[orderStatus]}
           </Tag>
         </p>
       </div>
@@ -149,27 +160,29 @@ const OrderDetails = () => {
         <h3 className="font-semibold">Thông tin đơn hàng</h3>
         <div className="space-y-3 px-3 py-5 border rounded">
           <p>
-            <strong>Họ tên:</strong> {shipping_address.name}
+            <strong>Họ tên:</strong> {shippingAddress?.name}
           </p>
           <p>
-            <strong>Số điện thoại:</strong> {shipping_address.phone}
+            <strong>Số điện thoại:</strong> {shippingAddress?.phone}
           </p>
           <p>
-            <strong>Địa chỉ:</strong> {shipping_address.home_address},{" "}
-            {shipping_address.ward}, {shipping_address.district},{" "}
-            {shipping_address.province}
+            <strong>Địa chỉ:</strong> {shippingAddress?.homeAddress},{" "}
+            {shippingAddress?.ward}, {shippingAddress?.district},{" "}
+            {shippingAddress?.province}
           </p>
           <p>
-            <strong>Ghi chú:</strong> {order_note}
+            <strong>Ghi chú:</strong> {orderNote}
           </p>
           <p>
             <strong>Ngày giao dự kiến:</strong>{" "}
-            {new Date(estimated_delivery_date).toLocaleString()}
+            {new Date(estimatedDeliveryDate)?.toLocaleString()}
           </p>
-          <p>
-            <strong>Đã nhận hàng:</strong>{" "}
-            {new Date(received_date).toLocaleString()}
-          </p>
+          {receivedDate && (
+            <p>
+              <strong>Đã nhận hàng:</strong>{" "}
+              {new Date(receivedDate)?.toLocaleString()}
+            </p>
+          )}
         </div>
         {paymentInfo?.transactions.length > 0 && (
           <div>
@@ -196,7 +209,7 @@ const OrderDetails = () => {
                 <strong>Thời gian giao dịch:</strong>{" "}
                 {new Date(
                   paymentInfo.transactions[0]?.transactionDateTime
-                ).toLocaleString()}
+                )?.toLocaleString()}
               </p>
             </div>
           </div>
@@ -221,28 +234,22 @@ const OrderDetails = () => {
         <div className="space-y-3 px-3 py-5 border rounded">
           <div className="flex justify-between">
             <strong>Tổng tiền hàng:</strong>
-            <span>{order_total_price.toLocaleString()} đ</span>
+            <span>{orderTotalPrice?.toLocaleString()} đ</span>
           </div>
           <div className="flex justify-between">
             <strong>Phí giao hàng:</strong>
-            <span>{delivery_fee.toLocaleString()} đ</span>
+            <span>{deliveryFee?.toLocaleString()} đ</span>
           </div>
           <div className="flex justify-between">
             <strong>Giảm giá:</strong>
-            <span>{order_total_discount} %</span>
+            <span>{orderTotalDiscount} %</span>
           </div>
           <div className="flex justify-between text-[#1890ff] font-semibold">
             <strong>Tổng tiền phải thanh toán:</strong>
-            <span>{order_total_final.toLocaleString()} đ</span>
+            <span>{orderTotalFinal?.toLocaleString()} đ</span>
           </div>
         </div>
       </div>
-
-      {is_feedback && (
-        <div className="bg-white p-6 shadow-lg rounded-lg mt-4 space-y-5">
-          <h3 className="font-semibold">Đánh giá sản phẩm</h3>
-        </div>
-      )}
     </div>
   );
 };

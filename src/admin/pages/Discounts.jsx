@@ -26,13 +26,27 @@ import { usePopup } from "../../context/PopupContext";
 const { Option } = Select;
 
 const statusColors = {
-  active: "green",
-  expired: "red",
-  upcoming: "blue",
+  ACTIVE: "green",
+  EXPIRED: "red",
+  UPCOMING: "blue",
+};
+
+const statusText = {
+  ACTIVE: "Hoạt động",
+  UPCOMING: "Sắp tới",
+  EXPIRED: "Hết hạn",
+};
+
+const calculateStatus = (start, end) => {
+  const now = moment();
+  if (moment(end).isBefore(now, "day")) return "EXPIRED";
+  if (moment(start).isAfter(now, "day")) return "UPCOMING";
+  return "ACTIVE";
 };
 
 const Discounts = () => {
-  const [form] = Form.useForm();
+  const [addForm] = Form.useForm();
+  const [editForm] = Form.useForm();
   const [searchText, setSearchText] = useState("");
   const [filterStatus, setFilterStatus] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -58,7 +72,7 @@ const Discounts = () => {
   useEffect(() => {
     const fetchDiscountsData = async () => {
       const user = await fetchUser();
-      if (user.result.role !== "admin") {
+      if (user.result.role !== "ADMIN") {
         window.location.href = "/sign-in"; // Redirect to home page if not admin
       } else {
         fetchDiscounts();
@@ -85,49 +99,53 @@ const Discounts = () => {
   };
 
   const filteredDiscounts = discounts.filter((discount) => {
-    const matchesStatus = filterStatus
-      ? discount.status === filterStatus
-      : true;
+    const status = calculateStatus(
+      discount.discountStartDay,
+      discount.discountEndDay
+    );
+
+    const matchesStatus = filterStatus ? status === filterStatus : true;
+
     const matchesSearch = searchText
-      ? discount.discount_code.toLowerCase().includes(searchText.toLowerCase())
+      ? discount.discountCode.toLowerCase().includes(searchText.toLowerCase())
       : true;
+
     return matchesStatus && matchesSearch;
   });
 
   const handleAddDiscount = async () => {
     try {
-      await form.validateFields();
-      const newDiscount = form.getFieldsValue();
+      await addForm.validateFields();
+      const newDiscount = addForm.getFieldsValue();
 
-      if (!newDiscount.discount_start_day || !newDiscount.discount_end_day) {
+      if (!newDiscount.discountStartDay || !newDiscount.discountEndDay) {
         return;
       }
 
       const res = await handleCreateDiscount(newDiscount);
       if (res?.EC === 0) {
         fetchDiscounts();
-        form.resetFields();
+        addForm.resetFields();
         setIsAddDiscountModalVisible(false);
       }
     } catch {
       return;
     }
   };
-
   const handleEditDiscount = (record) => {
     if (record) {
       const formattedRecord = {
         ...record,
-        discount_start_day: record.discount_start_day
-          ? moment(record.discount_start_day)
+        discountStartDay: record.discountStartDay
+          ? moment(record.discountStartDay)
           : null,
-        discount_end_day: record.discount_end_day
-          ? moment(record.discount_end_day)
+        discountEndDay: record.discountEndDay
+          ? moment(record.discountEndDay)
           : null,
       };
 
       setSelectedDiscount(formattedRecord); // Cập nhật giá trị discount được chọn
-      form.setFieldsValue(formattedRecord); // Điền thông tin discount vào form
+      editForm.setFieldsValue(formattedRecord); // Điền thông tin discount vào form
       setIsEditDiscountModalVisible(true); // Mở modal chỉnh sửa
     } else {
       return;
@@ -136,17 +154,17 @@ const Discounts = () => {
 
   const handleUpdate = async () => {
     try {
-      await form.validateFields();
-      const updatedFields = form.getFieldsValue();
+      await editForm.validateFields();
+      const updatedFields = editForm.getFieldsValue();
       const updatedDiscount = { ...selectedDiscount, ...updatedFields };
 
       const res = await handleUpdateDiscount(
-        selectedDiscount._id,
+        selectedDiscount.id,
         updatedDiscount
       );
       if (res?.EC === 0) {
         fetchDiscounts();
-        form.resetFields();
+        editForm.resetFields();
         setIsEditDiscountModalVisible(false);
       }
     } catch {
@@ -155,19 +173,19 @@ const Discounts = () => {
   };
 
   const columns = [
-    { title: "Mã giảm giá", dataIndex: "_id", key: "_id" },
-    { title: "Code", dataIndex: "discount_code", key: "discount_code" },
-    { title: "Loại", dataIndex: "discount_type", key: "discount_type" },
+    { title: "Mã giảm giá", dataIndex: "id", key: "id" },
+    { title: "Code", dataIndex: "discountCode", key: "discountCode" },
+    { title: "Loại", dataIndex: "discountType", key: "discountType" },
     { title: "Mô tả", dataIndex: "description", key: "description" },
     {
       title: "Số lượng giảm giá",
-      dataIndex: "discount_amount",
-      key: "discount_amount",
+      dataIndex: "discountAmount",
+      key: "discountAmount",
     },
     {
       title: "Hạn sử dụng",
-      dataIndex: "discount_end_day",
-      key: "discount_end_day",
+      dataIndex: "discountEndDay",
+      key: "discountEndDay",
       render: (text) => {
         return text ? moment(text).format("YYYY-MM-DD") : "";
       },
@@ -176,11 +194,13 @@ const Discounts = () => {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      render: (status) => (
-        <Tag className="py-1 px-2" color={statusColors[status]}>
-          {status}
-        </Tag>
-      ),
+      render: (_, record) => {
+        const status = calculateStatus(
+          record.discountStartDay,
+          record.discountEndDay
+        );
+        return <Tag color={statusColors[status]}>{statusText[status]}</Tag>;
+      },
     },
     {
       title: "Chỉnh sửa",
@@ -224,9 +244,9 @@ const Discounts = () => {
             allowClear
             className="w-[300px]"
           >
-            <Option value="active">Hoạt động</Option>
-            <Option value="expired">Hết hạn</Option>
-            <Option value="upcoming">Sắp tới</Option>
+            <Option value="ACTIVE">Hoạt động</Option>
+            <Option value="EXPIRED">Hết hạn</Option>
+            <Option value="UPCOMING">Sắp tới</Option>
           </Select>
           <Button
             type="primary"
@@ -248,7 +268,7 @@ const Discounts = () => {
           dataSource={filteredDiscounts}
           columns={columns}
           pagination={{ pageSize: 8 }}
-          rowKey="_id"
+          rowKey="id"
           scroll={{ x: "max-content" }}
         />
       </div>
@@ -274,43 +294,43 @@ const Discounts = () => {
         okText="Thêm"
         cancelText="Hủy"
       >
-        <Form form={form} layout="vertical" onFinish={handleAddDiscount}>
+        <Form form={addForm} layout="vertical" onFinish={handleAddDiscount}>
           <Form.Item
             label="Tên mã giảm giá"
-            name="discount_title"
+            name="discountTitle"
             rules={[{ required: true, message: "Tiêu đề là bắt buộc" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Mã giảm giá"
-            name="discount_code"
+            name="discountCode"
             rules={[{ required: true, message: "Mã Code là bắt buộc" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Loại giảm giá"
-            name="discount_type"
+            name="discountType"
             rules={[{ required: true, message: "Loại giảm giá là bắt buộc" }]}
           >
             <Select>
-              <Option value="shipping">Vận chuyển</Option>
-              <Option value="product">Sản phẩm</Option>
+              <Option value="SHIPPING">Vận chuyển</Option>
+              <Option value="PRODUCT">Sản phẩm</Option>
             </Select>
           </Form.Item>
           <Form.Item
-            label="Số lượng giảm giá (%)"
-            name="discount_number"
+            label="Phần trăm giảm giá (%)"
+            name="discountNumber"
             rules={[
-              { required: true, message: "Số lượng giảm giá là bắt buộc" },
+              { required: true, message: "Phần trăm giảm giá là bắt buộc" },
             ]}
           >
             <InputNumber min={0} max={100} />
           </Form.Item>
           <Form.Item
-            label="Số lượng mã giảm giá (%)"
-            name="discount_amount"
+            label="Số lượng mã giảm giá"
+            name="discountAmount"
             rules={[
               { required: true, message: "Số lượng mã giảm giá là bắt buộc" },
             ]}
@@ -319,27 +339,53 @@ const Discounts = () => {
           </Form.Item>
           <Form.Item
             label="Ngày bắt đầu"
-            name="discount_start_day"
+            name="discountStartDay"
             rules={[{ required: true, message: "Ngày bắt đầu là bắt buộc" }]}
           >
             <DatePicker format="YYYY-MM-DD" />
           </Form.Item>
           <Form.Item
             label="Ngày kết thúc"
-            name="discount_end_day"
-            rules={[{ required: true, message: "Ngày kết thúc là bắt buộc" }]}
+            name="discountEndDay"
+            dependencies={["discountStartDay"]}
+            rules={[
+              { required: true, message: "Ngày kết thúc là bắt buộc" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue("discountStartDay");
+
+                  if (
+                    !value ||
+                    !start ||
+                    moment(value).isSameOrAfter(moment(start), "day")
+                  ) {
+                    return Promise.resolve();
+                  }
+
+                  return Promise.reject(
+                    new Error("Ngày kết thúc phải sau hoặc bằng ngày bắt đầu")
+                  );
+                },
+              }),
+            ]}
           >
-            <DatePicker format="YYYY-MM-DD" />
+            <DatePicker
+              format="YYYY-MM-DD"
+              disabledDate={(current) => {
+                const start = addForm.getFieldValue("discountStartDay");
+                return start && current.isBefore(start, "day");
+              }}
+            />
           </Form.Item>
           <Form.Item label="Mô tả" name="description">
             <Input.TextArea />
           </Form.Item>
-          <Form.Item label="Giá trị đơn hàng tối thiểu" name="min_order_value">
+          <Form.Item label="Giá trị đơn hàng tối thiểu" name="minOrderValue">
             <InputNumber />
           </Form.Item>
           <Form.Item
             label="Danh mục áp dụng"
-            name="applicable_categories"
+            name="applicableCategories"
             rules={[{ required: true, message: "Danh mục là bắt buộc" }]}
           >
             <Select
@@ -351,9 +397,9 @@ const Discounts = () => {
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      const allCategoryIds = categories.map((c) => c._id);
-                      form.setFieldsValue({
-                        applicable_categories: allCategoryIds,
+                      const allCategoryIds = categories.map((c) => c.id);
+                      addForm.setFieldsValue({
+                        applicableCategories: allCategoryIds,
                       });
                     }}
                   >
@@ -363,7 +409,7 @@ const Discounts = () => {
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      form.setFieldsValue({ applicable_categories: [] });
+                      addForm.setFieldsValue({ applicableCategories: [] });
                     }}
                   >
                     Bỏ chọn tất cả
@@ -374,15 +420,15 @@ const Discounts = () => {
               )}
             >
               {categories?.map((category) => (
-                <Select.Option key={category._id} value={category._id}>
-                  {category.category_type} - {category.category_gender}
+                <Select.Option key={category.id} value={category.id}>
+                  {category.categoryType} - {category.categoryGender}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item
             label="Sản phẩm áp dụng"
-            name="applicable_products"
+            name="applicableProducts"
             rules={[{ required: true, message: "Sản phẩm là bắt buộc" }]}
           >
             <Select
@@ -394,8 +440,10 @@ const Discounts = () => {
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      const allProducts = products.map((c) => c._id);
-                      form.setFieldsValue({ applicable_products: allProducts });
+                      const allProducts = products.map((c) => c.id);
+                      addForm.setFieldsValue({
+                        applicableProducts: allProducts,
+                      });
                     }}
                   >
                     Chọn tất cả
@@ -404,7 +452,7 @@ const Discounts = () => {
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
-                      form.setFieldsValue({ applicable_products: [] });
+                      addForm.setFieldsValue({ applicableProducts: [] });
                     }}
                   >
                     Bỏ chọn tất cả
@@ -415,8 +463,8 @@ const Discounts = () => {
               )}
             >
               {products?.map((product) => (
-                <Select.Option key={product._id} value={product._id}>
-                  {product.product_title}
+                <Select.Option key={product.id} value={product.id}>
+                  {product.productTitle}
                 </Select.Option>
               ))}
             </Select>
@@ -432,47 +480,47 @@ const Discounts = () => {
         cancelText="Hủy"
       >
         <Form
-          form={form}
+          form={editForm}
           layout="vertical"
           initialValues={selectedDiscount} // Điền giá trị selectedDiscount vào form
           onFinish={handleUpdate} // Xử lý cập nhật thông tin
         >
           <Form.Item
             label="Tên mã giảm giá"
-            name="discount_title"
+            name="discountTitle"
             rules={[{ required: true, message: "Tiêu đề là bắt buộc" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Mã giảm giá"
-            name="discount_code"
+            name="discountCode"
             rules={[{ required: true, message: "Mã Code là bắt buộc" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Loại giảm giá"
-            name="discount_type"
+            name="discountType"
             rules={[{ required: true, message: "Loại giảm giá là bắt buộc" }]}
           >
             <Select>
-              <Option value="shipping">Vận chuyển</Option>
-              <Option value="product">Sản phẩm</Option>
+              <Option value="SHIPPING">Vận chuyển</Option>
+              <Option value="PRODUCT">Sản phẩm</Option>
             </Select>
           </Form.Item>
           <Form.Item
-            label="Số lượng giảm giá (%)"
-            name="discount_number"
+            label="Phần trăm giảm giá (%)"
+            name="discountNumber"
             rules={[
-              { required: true, message: "Số lượng giảm giá là bắt buộc" },
+              { required: true, message: "Phần trăm giảm giá là bắt buộc" },
             ]}
           >
             <InputNumber min={0} max={100} />
           </Form.Item>
           <Form.Item
-            label="Số lượng mã giảm giá (%)"
-            name="discount_amount"
+            label="Số lượng mã giảm giá"
+            name="discountAmount"
             rules={[
               { required: true, message: "Số lượng mã giảm giá là bắt buộc" },
             ]}
@@ -481,46 +529,72 @@ const Discounts = () => {
           </Form.Item>
           <Form.Item
             label="Ngày bắt đầu"
-            name="discount_start_day"
+            name="discountStartDay"
             rules={[{ required: true, message: "Ngày bắt đầu là bắt buộc" }]}
           >
             <DatePicker format="YYYY-MM-DD" />
           </Form.Item>
           <Form.Item
             label="Ngày kết thúc"
-            name="discount_end_day"
-            rules={[{ required: true, message: "Ngày kết thúc là bắt buộc" }]}
+            name="discountEndDay"
+            dependencies={["discountStartDay"]}
+            rules={[
+              { required: true, message: "Ngày kết thúc là bắt buộc" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const start = getFieldValue("discountStartDay");
+
+                  if (
+                    !value ||
+                    !start ||
+                    moment(value).isSameOrAfter(moment(start), "day")
+                  ) {
+                    return Promise.resolve();
+                  }
+
+                  return Promise.reject(
+                    new Error("Ngày kết thúc phải sau hoặc bằng ngày bắt đầu")
+                  );
+                },
+              }),
+            ]}
           >
-            <DatePicker format="YYYY-MM-DD" />
+            <DatePicker
+              format="YYYY-MM-DD"
+              disabledDate={(current) => {
+                const start = editForm.getFieldValue("discountStartDay");
+                return start && current.isBefore(start, "day");
+              }}
+            />
           </Form.Item>
           <Form.Item label="Mô tả" name="description">
             <Input.TextArea />
           </Form.Item>
-          <Form.Item label="Giá trị đơn hàng tối thiểu" name="min_order_value">
+          <Form.Item label="Giá trị đơn hàng tối thiểu" name="minOrderValue">
             <InputNumber />
           </Form.Item>
           <Form.Item
             label="Danh mục áp dụng"
-            name="applicable_categories"
+            name="applicableCategories"
             rules={[{ required: true, message: "Danh mục là bắt buộc" }]}
           >
             <Select mode="multiple">
               {categories?.map((category) => (
-                <Option key={category._id} value={category._id}>
-                  {category.category_type}
+                <Option key={category.id} value={category.id}>
+                  {category.categoryType}
                 </Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item
             label="Sản phẩm áp dụng"
-            name="applicable_products"
+            name="applicableProducts"
             rules={[{ required: true, message: "Sản phẩm là bắt buộc" }]}
           >
             <Select mode="multiple">
               {products?.map((product) => (
-                <Option key={product._id} value={product._id}>
-                  {product.product_title}
+                <Option key={product.id} value={product.id}>
+                  {product.productTitle}
                 </Option>
               ))}
             </Select>

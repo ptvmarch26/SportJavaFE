@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Table,
-  Input,
-  Select,
-  Button,
-  Modal,
-  Form,
-  InputNumber,
-} from "antd";
+import { Table, Input, Select, Button, Modal, Form, InputNumber } from "antd";
 import {
   DeleteOutlined,
   ExportOutlined,
@@ -27,7 +19,8 @@ const { Option } = Select;
 const Products = () => {
   const { products, fetchProducts, removeProduct, addProduct, editProduct } =
     useProduct();
-  const [form] = Form.useForm();
+  const [addForm] = Form.useForm();
+  const [editForm] = Form.useForm();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [filterStatus, setFilterStatus] = useState(null);
@@ -56,7 +49,6 @@ const Products = () => {
       showPopup("Xóa sản phẩm thành công");
     } catch {
       showPopup("Lỗi khi xóa sản phẩm", false);
-
     }
   };
 
@@ -68,19 +60,20 @@ const Products = () => {
   const handleAddProduct = async () => {
     try {
       setLoading(true, "Đang thêm sản phẩm");
-      await form.validateFields();
-      const newProduct = form.getFieldsValue();
+      await addForm.validateFields();
+      const newProduct = addForm.getFieldsValue();
 
       const res = await addProduct(newProduct);
       if (res?.EC === 0) {
+        setLoading(false);
+        showPopup("Thêm sản phẩm thành công");
         fetchProducts();
-        form.resetFields();
+        addForm.resetFields();
         setIsAddProductModalVisible(false);
       }
     } catch {
       return;
     }
-    setLoading(false);
   };
 
   const urlToFile = async (url, filename, mimeType = "image/png") => {
@@ -90,11 +83,12 @@ const Products = () => {
   };
 
   const handleEditProduct = async (record) => {
+    console.log("recird", record);
     setLoading(true, "Đang mở form sản phẩm");
     const productImages = await Promise.all(
-      (Array.isArray(record.product_img)
-        ? record.product_img
-        : [record.product_img]
+      (Array.isArray(record.productImg)
+        ? record.productImg
+        : [record.productImg]
       )
         .filter(Boolean)
         .map(async (url, index) => ({
@@ -107,24 +101,24 @@ const Products = () => {
 
     const colorImages = await Promise.all(
       (record.colors || []).map(async (color, colorIndex) => {
-        const imgMain = color.imgs?.img_main
+        const imgMain = color.imgs?.imgMain
           ? [
               {
                 uid: `main-${colorIndex}`,
                 name: `main-color-${colorIndex}.png`,
                 status: "done",
-                url: color.imgs.img_main,
+                url: color.imgs.imgMain,
                 originFileObj: await urlToFile(
-                  color.imgs.img_main,
+                  color.imgs.imgMain,
                   `main-color-${colorIndex}.png`
                 ),
               },
             ]
           : [];
 
-        const imgSubs = Array.isArray(color.imgs?.img_subs)
+        const imgSubs = Array.isArray(color.imgs?.imgSubs)
           ? await Promise.all(
-              color.imgs.img_subs.map(async (url, idx) => ({
+              color.imgs.imgSubs.map(async (url, idx) => ({
                 uid: `sub-${colorIndex}-${idx}`,
                 name: `sub-color-${colorIndex}-${idx}.png`,
                 status: "done",
@@ -140,8 +134,8 @@ const Products = () => {
         return {
           ...color,
           imgs: {
-            img_main: imgMain,
-            img_subs: imgSubs,
+            imgMain: imgMain,
+            imgSubs: imgSubs,
           },
         };
       })
@@ -149,38 +143,39 @@ const Products = () => {
 
     const recordWithNormalizedImages = {
       ...record,
-      product_img: productImages,
-      product_category: record.product_category._id,
+      productImg: productImages,
+      productCategory: record.productCategory.id,
       colors: colorImages,
     };
 
     setSelectedProduct(recordWithNormalizedImages);
-    form.setFieldsValue(recordWithNormalizedImages);
+    editForm.setFieldsValue(recordWithNormalizedImages);
     setIsEditProductgModalVisible(true);
   };
 
   const handleUpdate = async () => {
-    setLoading(true, "Đang sửa sản phẩm");
+    setLoading(true, "Đang cập nhật sản phẩm");
     try {
-      await form.validateFields();
-      const updatedFields = form.getFieldsValue();
-      const res = await editProduct(selectedProduct._id, updatedFields);
+      await editForm.validateFields();
+      const updatedFields = editForm.getFieldsValue();
+      const res = await editProduct(selectedProduct.id, updatedFields);
       if (res?.EC === 0) {
+        setLoading(false);
+        showPopup("Cập nhật sản phẩm thành công");
         fetchProducts();
-        form.resetFields();
+        editForm.resetFields();
         setIsEditProductgModalVisible(false);
       }
     } catch {
       showPopup("Lỗi khi cập nhật sản phẩm", false);
     }
-    setLoading(false);
   };
 
   const filteredProducts = products.filter((product) => {
     let productStatus;
-    if (product?.product_countInStock === 0) {
+    if (product?.productCountInStock === 0) {
       productStatus = "Hết hàng";
-    } else if (product?.product_countInStock < 10) {
+    } else if (product?.productCountInStock < 10) {
       productStatus = "Cần nhập";
     } else {
       productStatus = "Còn hàng";
@@ -189,7 +184,7 @@ const Products = () => {
     const matchesStatus = filterStatus ? productStatus === filterStatus : true;
 
     const matchesSearch = searchText
-      ? product.product_title.toLowerCase().includes(searchText.toLowerCase())
+      ? product.productTitle.toLowerCase().includes(searchText.toLowerCase())
       : true;
 
     return matchesStatus && matchesSearch;
@@ -198,46 +193,46 @@ const Products = () => {
   const columns = [
     {
       title: "Ảnh",
-      dataIndex: "product_img",
-      key: "product_img",
-      render: (product_img) => (
+      dataIndex: "productImg",
+      key: "productImg",
+      render: (productImg) => (
         <img
-          src={product_img}
+          src={productImg}
           alt="Ảnh sản phẩm"
           className="w-16 h-16 object-cover rounded"
         />
       ),
     },
-    { title: "Tên sản phẩm", dataIndex: "product_title", key: "product_title" },
-    { title: "Thương hiệu", dataIndex: "product_brand", key: "product_brand" },
+    { title: "Tên sản phẩm", dataIndex: "productTitle", key: "productTitle" },
+    { title: "Thương hiệu", dataIndex: "productBrand", key: "productBrand" },
     {
       title: "Số lượng tồn",
-      dataIndex: "product_countInStock",
-      key: "product_countInStock",
+      dataIndex: "productCountInStock",
+      key: "productCountInStock",
       render: (value) => `${value}`,
     },
     {
       title: "Đã bán",
-      dataIndex: "product_selled",
-      key: "product_selled",
+      dataIndex: "productSelled",
+      key: "productSelled",
       render: (value) => value ?? 0,
     },
     {
       title: "Giá gốc",
-      dataIndex: "product_price",
-      key: "product_price",
+      dataIndex: "productPrice",
+      key: "productPrice",
       render: (value) => `${value}đ`,
     },
     {
       title: "Giảm giá (%)",
-      dataIndex: "product_percent_discount",
-      key: "product_percent_discount",
+      dataIndex: "productPercentDiscount",
+      key: "productPercentDiscount",
       render: (value) => `${value}%`,
     },
     {
       title: "Đánh giá",
-      dataIndex: "product_rate",
-      key: "product_rate",
+      dataIndex: "productRate",
+      key: "productRate",
       render: (value) => value ?? "Chưa có",
     },
     {
@@ -258,7 +253,7 @@ const Products = () => {
       render: (record) => (
         <span
           className="text-blue-500 cursor-pointer"
-          onClick={() => navigate(`/admin/product-details/${record._id}`)}
+          onClick={() => navigate(`/admin/product-details/${record.id}`)}
         >
           Chi tiết
         </span>
@@ -323,8 +318,8 @@ const Products = () => {
           rowSelection={{ selectedRowKeys, onChange: setSelectedRowKeys }}
           dataSource={filteredProducts}
           columns={columns}
-          pagination={{ pageSize: 10 }}
-          rowKey="_id"
+          pagination={{ pageSize: 15 }}
+          rowKey="id"
           className="rounded-none cursor-pointer"
           scroll={{ x: "max-content" }}
         />
@@ -349,29 +344,29 @@ const Products = () => {
       <Modal
         title="Thêm sản phẩm mới"
         open={isAddProductModalVisible}
-        onOk={form.submit}
+        onOk={addForm.submit}
         onCancel={() => setIsAddProductModalVisible(false)}
         okText="Thêm"
         cancelText="Hủy"
         width={800}
       >
         <Form
-          form={form}
+          form={addForm}
           layout="vertical"
           onFinish={handleAddProduct}
           initialValues={{
-            product_price: 0,
-            product_percent_discount: 0,
-            product_rate: 0,
-            product_selled: 0,
-            product_display: true,
-            product_famous: false,
+            productPrice: 0,
+            productPercentDiscount: 0,
+            productRate: 0,
+            productSelled: 0,
+            productDisplay: true,
+            productFamous: false,
             colors: [],
           }}
         >
           <Form.Item
             label="Tên sản phẩm"
-            name="product_title"
+            name="productTitle"
             rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm" }]}
           >
             <Input />
@@ -379,37 +374,37 @@ const Products = () => {
 
           <Form.Item
             label="Thương hiệu"
-            name="product_brand"
+            name="productBrand"
             rules={[{ required: true, message: "Vui lòng nhập thương hiệu" }]}
           >
             <Input />
           </Form.Item>
 
-          <Form.Item label="Giá gốc" name="product_price">
+          <Form.Item label="Giá gốc" name="productPrice">
             <InputNumber min={0} className="w-full" />
           </Form.Item>
 
-          <Form.Item label="Đã bán" name="product_selled">
+          <Form.Item label="Đã bán" name="productSelled">
             <InputNumber min={0} className="w-full" />
           </Form.Item>
 
-          <Form.Item label="Giảm giá chung (%)" name="product_percent_discount">
+          <Form.Item label="Giảm giá chung (%)" name="productPercentDiscount">
             <InputNumber min={0} max={100} className="w-full" />
           </Form.Item>
 
-          <Form.Item label="Đánh giá" name="product_rate">
+          <Form.Item label="Đánh giá" name="productRate">
             <InputNumber min={0} max={5} step={0.1} className="w-full" />
           </Form.Item>
 
           <Form.Item
             label="Danh mục"
-            name="product_category"
+            name="productCategory"
             rules={[{ required: true, message: "Vui lòng chọn danh mục" }]}
           >
             <Select>
               {categories?.map((cat) => (
-                <Select.Option key={cat._id} value={cat._id}>
-                  {cat.category_type} - {cat.category_gender}
+                <Select.Option key={cat.id} value={cat.id}>
+                  {cat.categoryType} - {cat.categoryGender}
                 </Select.Option>
               ))}
             </Select>
@@ -417,7 +412,7 @@ const Products = () => {
 
           <Form.Item
             label="Mô tả sản phẩm"
-            name="product_description"
+            name="productDescription"
             rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
             <Input.TextArea rows={4} />
@@ -425,7 +420,7 @@ const Products = () => {
 
           <Form.Item
             label="Ảnh sản phẩm"
-            name="product_img"
+            name="productImg"
             valuePropName="fileList"
             getValueFromEvent={normFile}
             rules={[{ required: true, message: "Vui lòng tải ảnh sản phẩm" }]}
@@ -441,7 +436,7 @@ const Products = () => {
           </Form.Item>
 
           <Form.Item
-            name="product_display"
+            name="productDisplay"
             label="Hiển thị sản phẩm"
             valuePropName="checked"
           >
@@ -449,7 +444,7 @@ const Products = () => {
           </Form.Item>
 
           <Form.Item
-            name="product_famous"
+            name="productFamous"
             label="Sản phẩm nổi bật"
             valuePropName="checked"
           >
@@ -476,7 +471,7 @@ const Products = () => {
                     >
                       <Form.Item
                         {...colorRestField}
-                        name={[colorName, "color_name"]}
+                        name={[colorName, "colorName"]}
                         label="Tên màu"
                         rules={[
                           { required: true, message: "Vui lòng nhập tên màu" },
@@ -487,7 +482,7 @@ const Products = () => {
 
                       <Form.Item
                         {...colorRestField}
-                        name={[colorName, "imgs", "img_main"]}
+                        name={[colorName, "imgs", "imgMain"]}
                         label="Ảnh chính của màu"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
@@ -509,7 +504,7 @@ const Products = () => {
 
                       <Form.Item
                         {...colorRestField}
-                        name={[colorName, "imgs", "img_subs"]}
+                        name={[colorName, "imgs", "imgSubs"]}
                         label="Ảnh phụ của màu"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
@@ -563,7 +558,7 @@ const Products = () => {
                                 >
                                   <Form.Item
                                     {...variantRestField}
-                                    name={[variantName, "variant_size"]}
+                                    name={[variantName, "variantSize"]}
                                     label="Kích thước"
                                     rules={[
                                       {
@@ -577,7 +572,7 @@ const Products = () => {
 
                                   <Form.Item
                                     {...variantRestField}
-                                    name={[variantName, "variant_price"]}
+                                    name={[variantName, "variantPrice"]}
                                     label="Giá"
                                     rules={[
                                       {
@@ -591,7 +586,7 @@ const Products = () => {
 
                                   <Form.Item
                                     {...variantRestField}
-                                    name={[variantName, "variant_countInStock"]}
+                                    name={[variantName, "variantCountInStock"]}
                                     label="Số lượng tồn"
                                     rules={[
                                       {
@@ -649,14 +644,14 @@ const Products = () => {
         cancelText="Hủy"
       >
         <Form
-          form={form}
+          form={editForm}
           layout="vertical"
           onFinish={handleUpdate}
           initialValues={selectedProduct}
         >
           <Form.Item
             label="Tên sản phẩm"
-            name="product_title"
+            name="productTitle"
             rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm" }]}
           >
             <Input />
@@ -664,7 +659,7 @@ const Products = () => {
 
           <Form.Item
             label="Thương hiệu"
-            name="product_brand"
+            name="productBrand"
             rules={[{ required: true, message: "Vui lòng nhập thương hiệu" }]}
           >
             <Input />
@@ -672,33 +667,33 @@ const Products = () => {
 
           <Form.Item
             label="Giá gốc"
-            name="product_price"
+            name="productPrice"
             rules={[{ required: true, message: "Vui lòng nhập giá" }]}
           >
             <InputNumber min={0} className="w-full" />
           </Form.Item>
 
-          <Form.Item label="Đã bán" name="product_selled">
+          <Form.Item label="Đã bán" name="productSelled">
             <InputNumber min={0} className="w-full" />
           </Form.Item>
 
-          <Form.Item label="Giảm giá chung (%)" name="product_percent_discount">
+          <Form.Item label="Giảm giá chung (%)" name="productPercentDiscount">
             <InputNumber min={0} max={100} className="w-full" />
           </Form.Item>
 
-          <Form.Item label="Đánh giá" name="product_rate">
+          <Form.Item label="Đánh giá" name="productRate">
             <InputNumber min={0} max={5} step={0.1} className="w-full" />
           </Form.Item>
 
           <Form.Item
             label="Danh mục"
-            name="product_category"
+            name="productCategory"
             rules={[{ required: true, message: "Vui lòng chọn danh mục" }]}
           >
             <Select>
               {categories?.map((cat) => (
-                <Select.Option key={cat._id} value={cat._id}>
-                  {cat.category_type} - {cat.category_gender}
+                <Select.Option key={cat.id} value={cat.id}>
+                  {cat.categoryType} - {cat.categoryGender}
                 </Select.Option>
               ))}
             </Select>
@@ -706,7 +701,7 @@ const Products = () => {
 
           <Form.Item
             label="Mô tả sản phẩm"
-            name="product_description"
+            name="productDescription"
             rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
           >
             <Input.TextArea rows={4} />
@@ -714,7 +709,7 @@ const Products = () => {
 
           <Form.Item
             label="Ảnh sản phẩm"
-            name="product_img"
+            name="productImg"
             valuePropName="fileList"
             getValueFromEvent={normFile}
           >
@@ -729,7 +724,7 @@ const Products = () => {
           </Form.Item>
 
           <Form.Item
-            name="product_display"
+            name="productDisplay"
             label="Hiển thị sản phẩm"
             valuePropName="checked"
           >
@@ -737,7 +732,7 @@ const Products = () => {
           </Form.Item>
 
           <Form.Item
-            name="product_famous"
+            name="productFamous"
             label="Sản phẩm nổi bật"
             valuePropName="checked"
           >
@@ -764,7 +759,7 @@ const Products = () => {
                     >
                       <Form.Item
                         {...colorRestField}
-                        name={[colorName, "color_name"]}
+                        name={[colorName, "colorName"]}
                         label="Tên màu"
                         rules={[
                           { required: true, message: "Vui lòng nhập tên màu" },
@@ -775,7 +770,7 @@ const Products = () => {
 
                       <Form.Item
                         {...colorRestField}
-                        name={[colorName, "imgs", "img_main"]}
+                        name={[colorName, "imgs", "imgMain"]}
                         label="Ảnh chính của màu"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
@@ -794,7 +789,7 @@ const Products = () => {
 
                       <Form.Item
                         {...colorRestField}
-                        name={[colorName, "imgs", "img_subs"]}
+                        name={[colorName, "imgs", "imgSubs"]}
                         label="Ảnh phụ của màu"
                         valuePropName="fileList"
                         getValueFromEvent={normFile}
@@ -842,7 +837,7 @@ const Products = () => {
                                 >
                                   <Form.Item
                                     {...variantRestField}
-                                    name={[variantName, "variant_size"]}
+                                    name={[variantName, "variantSize"]}
                                     label="Kích thước"
                                     rules={[
                                       {
@@ -856,7 +851,7 @@ const Products = () => {
 
                                   <Form.Item
                                     {...variantRestField}
-                                    name={[variantName, "variant_price"]}
+                                    name={[variantName, "variantPrice"]}
                                     label="Giá"
                                     rules={[
                                       {
@@ -870,7 +865,7 @@ const Products = () => {
 
                                   <Form.Item
                                     {...variantRestField}
-                                    name={[variantName, "variant_countInStock"]}
+                                    name={[variantName, "variantCountInStock"]}
                                     label="Số lượng tồn"
                                     rules={[
                                       {
