@@ -59,9 +59,7 @@ export const deleteDiscount = async (discountId) => {
 
 export const getDiscountForOrder = async (productIds) => {
   try {
-    const response = await AxiosInstance.post("/discount/get-for-order", {
-      productIds,
-    });
+    const response = await AxiosInstance.post("/discount/get-for-order", productIds);
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";

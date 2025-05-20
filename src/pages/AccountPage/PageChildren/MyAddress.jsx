@@ -20,7 +20,7 @@ function MyAddress() {
     if (!address.name) errors.name = "Vui lòng nhập Họ và tên";
     if (!address.phone)
       errors.phone = "Vui lòng nhập Số điện thoại";
-    if (!address.home_address) errors.home_address = "Vui lòng nhập Địa chỉ";
+    if (!address.homeAddress) errors.homeAddress = "Vui lòng nhập Địa chỉ";
     if (!address.province) errors.province = "Vui lòng chọn Tỉnh/Thành phố";
     if (!address.district) errors.district = "Vui lòng chọn Quận/Huyện";
     if (!address.ward) errors.ward = "Vui lòng chọn Phường/Xã";
@@ -58,7 +58,7 @@ function MyAddress() {
   const handleAddNewAddress = async () => {
     const newAddress = {
       ...editingAddress,
-      is_default: addresses.length === 0, 
+      isDefault: addresses.length === 0, 
     };
   
     await handleAddAddress(newAddress);
@@ -77,7 +77,7 @@ function MyAddress() {
   const handleSetDefault = async (index) => {
     const updatedAddresses = addresses?.map((addr, i) => ({
       ...addr,
-      is_default: i === index, // Đặt is_default thành true cho địa chỉ được chọn
+      isDefault: i === index, // Đặt is_default thành true cho địa chỉ được chọn
     }));
   
     setAddresses(updatedAddresses);
@@ -97,12 +97,12 @@ function MyAddress() {
   }, []);
 
   const handleDeleteAddresss = async (index) => {
-    const isDefaultAddress = addresses[index]?.is_default;
+    const isDefaultAddress = addresses[index]?.isDefault;
 
     const updatedAddresses = addresses.filter((_, i) => i !== index);
 
     if (isDefaultAddress && updatedAddresses.length > 0) {
-      updatedAddresses[0].is_default = true;
+      updatedAddresses[0].isDefault = true;
     };
     
     await handleDeleteAddress(index);
@@ -127,12 +127,12 @@ function MyAddress() {
                     {address.name} 
                   </p>
                   <p>
-                    {address.home_address}, {address.ward}, {address.district},{" "}
+                    {address.homeAddress}, {address.ward}, {address.district},{" "}
                     {address.province}
                   </p>
                   <p>{address.phone}</p>
                 </div>
-                {address.is_default && (
+                {address.isDefault && (
                   <MButton color="white" disabled className="h-full !shadow-lg">
                     Mặc định
                   </MButton>
@@ -156,7 +156,7 @@ function MyAddress() {
                 >
                   Xóa
                 </Button>
-                {!address.is_default && (
+                {!address.isDefault && (
                   <Button
                     type="link"
                     icon={<IoSettingsSharp />}

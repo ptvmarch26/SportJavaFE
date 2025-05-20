@@ -23,19 +23,19 @@ const ProductDetails = () => {
               <p className="text-gray-600 font-semibold">
                 🛒 Đã bán:{" "}
                 <span className="text-black">
-                  {productDetails?.product_selled}
+                  {productDetails?.productSelled}
                 </span>
               </p>
               <p className="text-yellow-500 font-semibold flex items-center">
-                ⭐ {productDetails?.product_rate} / 5
+                ⭐ {productDetails?.productRate} / 5
               </p>
             </div>
           </div>
 
           <div className="space-y-4 mb-6">
             <img
-              src={productDetails?.product_img}
-              alt={productDetails?.product_title}
+              src={productDetails?.productImg}
+              alt={productDetails?.productTitle}
               className="w-40 h-40 object-cover rounded-xl border border-gray-300"
             />
           </div>
@@ -43,18 +43,18 @@ const ProductDetails = () => {
           <div className="grid sm:grid-cols-2 gap-6 mb-6">
             <div>
               <h4 className="font-semibold text-gray-700">Tên sản phẩm</h4>
-              <p className="text-gray-800">{productDetails?.product_title}</p>
+              <p className="text-gray-800">{productDetails?.productTitle}</p>
             </div>
             <div>
               <h4 className="font-semibold text-gray-700">Thương hiệu</h4>
-              <p className="text-gray-800">{productDetails?.product_brand}</p>
+              <p className="text-gray-800">{productDetails?.productBrand}</p>
             </div>
           </div>
 
           <div className="mb-6">
             <h4 className="font-semibold text-gray-700">Mô tả</h4>
             <p className="text-gray-800 whitespace-pre-line">
-              {productDetails?.product_description}
+              {productDetails?.productDescription}
             </p>
           </div>
 
@@ -62,30 +62,30 @@ const ProductDetails = () => {
             <div>
               <h4 className="font-semibold text-gray-700">Kho hàng</h4>
               <p className="text-gray-800">
-                {productDetails?.product_countInStock}
+                {productDetails?.productCountInStock}
               </p>
             </div>
-            {productDetails?.product_percent_discount > 0 && (
+            {productDetails?.productPercentDiscount > 0 && (
               <div>
                 <h4 className="font-semibold text-gray-700">Giá gốc</h4>
                 <p className="text-gray-800">
                   {(
-                    productDetails.product_price /
-                    (1 - productDetails.product_percent_discount / 100)
-                  ).toLocaleString()}
+                    productDetails.productPrice /
+                    (1 - productDetails.productPercentDiscount / 100)
+                  )?.toLocaleString()}
                 </p>
               </div>
             )}
             <div>
               <h4 className="font-semibold text-gray-700">Giá bán</h4>
               <p className="text-gray-800">
-                {productDetails?.product_price.toLocaleString()}₫
+                {productDetails?.productPrice?.toLocaleString()}₫
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-gray-700">Giảm giá</h4>
               <p className="text-red-600 font-semibold">
-                {productDetails?.product_percent_discount}%
+                {productDetails?.productPercentDiscount}%
               </p>
             </div>
           </div>
@@ -93,15 +93,15 @@ const ProductDetails = () => {
 
         <div className="bg-white shadow-xl p-6 rounded-xl">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">Biến thể</h1>
-          {productDetails?.colors.map((color, index) => (
+          {productDetails?.colors?.map((color, index) => (
             <Card key={index} className="mb-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
                   <h4 className="font-semibold text-gray-700 mb-2">
-                    Biến thể: {color.color_name}
+                    Biến thể: {color.colorName}
                   </h4>
                   <img
-                    src={color.imgs.img_main}
+                    src={color.imgs.imgMain}
                     alt="Ảnh chính"
                     className="w-28 h-28 object-cover rounded-lg border border-gray-300"
                   />
@@ -110,7 +110,7 @@ const ProductDetails = () => {
                 <div className="sm:col-span-2">
                   <h4 className="font-semibold text-gray-700 mb-2">Ảnh phụ</h4>
                   <div className="flex flex-wrap gap-4">
-                    {color.imgs.img_subs.map((img, imgIndex) => (
+                    {color.imgs.imgSubs?.map((img, imgIndex) => (
                       <img
                         key={imgIndex}
                         src={img}
@@ -121,7 +121,7 @@ const ProductDetails = () => {
                   </div>
                 </div>
 
-                {color.variants.map((variant, variantIndex) => (
+                {color.variants?.map((variant, variantIndex) => (
                   <div
                     key={variantIndex}
                     className="bg-gray-100 p-4 rounded-lg border border-gray-200 sm:col-span-2"
@@ -131,12 +131,12 @@ const ProductDetails = () => {
                         <h4 className="font-semibold text-gray-700">
                           Kích thước
                         </h4>
-                        <p className="text-gray-800">{variant.variant_size}</p>
+                        <p className="text-gray-800">{variant.variantSize}</p>
                       </div>
                       <div>
                         <h4 className="font-semibold text-gray-700">Giá</h4>
                         <p className="text-gray-800">
-                          {variant.variant_price.toLocaleString()}₫
+                          {variant.variantPrice?.toLocaleString()}₫
                         </p>
                       </div>
                       <div>
@@ -144,7 +144,7 @@ const ProductDetails = () => {
                           Kho hàng
                         </h4>
                         <p className="text-gray-800">
-                          {variant.variant_countInStock}
+                          {variant.variantCountInStock}
                         </p>
                       </div>
                     </div>

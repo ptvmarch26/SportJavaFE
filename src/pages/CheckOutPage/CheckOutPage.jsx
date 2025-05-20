@@ -20,9 +20,9 @@ const shippingMethods = [
 ];
 
 const paymentMethods = [
-  { id: "Cod", label: "Phương thức thanh toán khi nhận hàng (COD)" },
-  { id: "Paypal", label: "Phương Thức Chuyển Khoản" },
-  { id: "Momo", label: "Phương Thức Momo" },
+  { id: "COD", label: "Phương thức thanh toán khi nhận hàng (COD)" },
+  { id: "PAYPAL", label: "Phương Thức Chuyển Khoản" },
+  { id: "MOMO", label: "Phương Thức Momo" },
 ];
 
 function CheckoutPage() {
@@ -41,20 +41,20 @@ function CheckoutPage() {
   const [newAddress, setNewAddress] = useState({
     name: "",
     phone: "",
-    home_address: "",
+    homeAddress: "",
     province: "",
     district: "",
     ward: "",
-    is_default: "false",
+    isDefault: "false",
   });
   const [formErrors, setFormErrors] = useState({
     name: "",
     phone: "",
-    home_address: "",
+    homeAddress: "",
     province: "",
     district: "",
     ward: "",
-    is_default: "",
+    isDefault: "",
   });
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
@@ -99,15 +99,15 @@ function CheckoutPage() {
   }, [productId]);
 
   useEffect(() => {
-    if (productId && productDetails?._id) {
+    if (productId && productDetails?.id) {
       setCartItems([
         {
-          product_id: {
+          productId: {
             ...productDetails,
           },
           quantity: Number(quantity) || 1,
-          color_name: color,
-          variant_name: size,
+          colorName: color,
+          variantName: size,
         },
       ]);
     }
@@ -118,9 +118,10 @@ function CheckoutPage() {
       const buyAgainItems = location.state.fromBuyAgain || [];
 
       const convertedItems = buyAgainItems.map((item) => ({
-        ...item,
-        color_name: item.color, // rename
-        variant_name: item.variant, // rename
+        productId: item?.product || item?.productId,
+        quantity: item.quantity || quantity,
+        colorName: item.colorName || color,
+        variantName: item.variantName || size,
       }));
 
       setCartItems(convertedItems);
@@ -133,15 +134,16 @@ function CheckoutPage() {
 
   useEffect(() => {
     if (cartItems.length > 0) {
-      fetchDiscountForOrder(cartItems.map((item) => item.product_id._id));
+      const productIds = cartItems.map((item) => item.productId?.id);
+      fetchDiscountForOrder(productIds);
     }
   }, [cartItems]);
 
   const shippingVouchers = discounts?.filter(
-    (discount) => discount.discount_type === "shipping"
+    (discount) => discount.discountType === "SHIPPING"
   );
   const productVouchers = discounts?.filter(
-    (discount) => discount.discount_type === "product"
+    (discount) => discount.discountType === "PRODUCT"
   );
 
   const {
@@ -159,37 +161,35 @@ function CheckoutPage() {
     setAddresses(addressesUser);
 
     if (!selectedAddress && addressesUser.length > 0) {
-      const defaultAddress = addressesUser.find(
-        (address) => address.is_default
-      );
+      const defaultAddress = addressesUser.find((address) => address.isDefault);
       if (defaultAddress) setSelectedAddress(defaultAddress);
     }
   }, [selectedUser]);
 
   const handleAddAddresss = async () => {
     if (validateForm()) {
-      newAddress.is_default = addresses.length === 0;
+      newAddress.isDefault = addresses.length === 0;
       setAddresses([...addresses, newAddress]);
       await handleAddAddress(newAddress);
       setNewAddress({
         name: "",
         phone: "",
-        home_address: "",
+        homeAddress: "",
         province: "",
         district: "",
         ward: "",
-        is_default: "",
+        isDefault: "",
       });
     }
   };
 
   const handleDeleteAddresss = async (index) => {
-    const isDefaultAddress = addresses[index]?.is_default;
+    const isDefaultAddress = addresses[index]?.isDefault;
 
     const updatedAddresses = addresses.filter((_, i) => i !== index);
 
     if (isDefaultAddress && updatedAddresses.length > 0) {
-      updatedAddresses[0].is_default = true;
+      updatedAddresses[0].isDefault = true;
     }
 
     await handleDeleteAddress(index);
@@ -198,19 +198,17 @@ function CheckoutPage() {
     if (updatedAddresses.length === 0) {
       setSelectedAddress(null);
     } else {
-      setSelectedAddress(
-        updatedAddresses.find((address) => address.is_default)
-      );
+      setSelectedAddress(updatedAddresses.find((address) => address.isDefault));
     }
 
     setFormErrors({
       name: "",
       phone: "",
-      home_address: "",
+      homeAddress: "",
       province: "",
       district: "",
       ward: "",
-      is_default: "",
+      isDefault: "",
     });
   };
 
@@ -234,11 +232,11 @@ function CheckoutPage() {
       setNewAddress({
         name: "",
         phone: "",
-        home_address: "",
+        homeAddress: "",
         province: "",
         district: "",
         ward: "",
-        is_default: "",
+        isDefault: "",
       });
       setEditingIndex(null);
     }
@@ -249,16 +247,16 @@ function CheckoutPage() {
     const newVouchers = [];
 
     if (vouchers.product.applied)
-      newVouchers.push(vouchers.product.selectedVoucher._id);
+      newVouchers.push(vouchers.product.selectedVoucher?.id);
 
     if (vouchers.shipping.applied)
-      newVouchers.push(vouchers.shipping.selectedVoucher._id);
+      newVouchers.push(vouchers.shipping.selectedVoucher?.id);
 
     setSelectedVouchers(
       [
-        vouchers.product.applied ? vouchers.product.selectedVoucher._id : null,
+        vouchers.product.applied ? vouchers.product.selectedVoucher?.id : null,
         vouchers.shipping.applied
-          ? vouchers.shipping.selectedVoucher._id
+          ? vouchers.shipping.selectedVoucher?.id
           : null,
       ].filter(Boolean)
     );
@@ -274,8 +272,8 @@ function CheckoutPage() {
       errors.name = "Bạn chưa nhập Họ và Tên";
       isValid = false;
     }
-    if (!newAddress.home_address) {
-      errors.home_address = "Bạn chưa nhập Địa chỉ";
+    if (!newAddress.homeAddress) {
+      errors.homeAddress = "Bạn chưa nhập Địa chỉ";
       isValid = false;
     }
     if (!newAddress.province) {
@@ -319,7 +317,7 @@ function CheckoutPage() {
       return;
     }
 
-    if (selectedPayment === "Momo") {
+    if (selectedPayment === "MOMO") {
       showPopup(
         "Chức năng thanh toán Momo đang được phát triển, vui lòng chọn phương thức khác",
         false,
@@ -328,30 +326,31 @@ function CheckoutPage() {
       return;
     }
     const orderData = {
-      shipping_address: selectedAddress || newAddress,
+      shippingAddress: selectedAddress || newAddress,
       products: cartItems.map((item) => ({
-        product_id: item?.product_id?._id || item?._id,
+        productId: item?.productId?.id || item?.id,
         quantity: item.quantity || quantity,
-        color_name: item.color_name || color,
-        variant_name: item.variant_name || size,
+        colorName: item.colorName || color,
+        variantName: item.variantName || size,
       })),
-      order_payment_method: selectedPayment,
-      order_note: "",
-      discount_ids: selectedVouchers,
+      orderPaymentMethod: selectedPayment,
+      orderNote: "",
+      discountIds: selectedVouchers,
     };
 
     const res = await handleCreateOrder(orderData);
-    if (res?.EC === 0 && selectedPayment === "Paypal") {
+    console.log("ré", res);
+    if (res?.EC === 0 && selectedPayment === "PAYPAL") {
       showPopup("Đặt hàng thành công, chuyển hướng tới trang thanh toán");
       setTimeout(() => {
-        window.location.href = res.result.resultPayOS.checkoutUrl;
+        window.location.href = res.result.checkoutUrl;
       }, 2000);
       return;
     }
     if (res?.EC === 0) {
       setCart([]);
       navigate(
-        `/orders/order-details/${res.result._id}?code=00&status=SUCCESS&cancel=false`
+        `/orders/order-details/${res.result.id}?code=00&status=SUCCESS&cancel=false`
       );
       return;
     }
@@ -387,7 +386,7 @@ function CheckoutPage() {
               <div className="px-4 rounded-lg space-y-3">
                 <p className="text-[#757575]">{selectedAddress.name}</p>
                 <p className="text-[#757575]">
-                  {selectedAddress.home_address}, {selectedAddress.ward},{" "}
+                  {selectedAddress.homeAddress}, {selectedAddress.ward},{" "}
                   {selectedAddress.district}, {selectedAddress.province}
                 </p>
                 <p className="text-[#757575]">{selectedAddress.phone}</p>
@@ -469,8 +468,8 @@ function CheckoutPage() {
                   <div>
                     <p className="text-sm">{address.name}</p>
                     <p className="text-sm">
-                      {address.home_address}, {address.ward}, {address.district}
-                      , {address.province}
+                      {address.homeAddress}, {address.ward}, {address.district},{" "}
+                      {address.province}
                     </p>
                     <p className="text-sm">{address.phone}</p>
                   </div>

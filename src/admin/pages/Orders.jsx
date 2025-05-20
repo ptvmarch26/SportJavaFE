@@ -8,15 +8,15 @@ import { usePopup } from "../../context/PopupContext";
 
 const { Option } = Select;
 
-const statusOrder = [
-  "Chờ xác nhận",
-  "Đang chuẩn bị hàng",
-  "Đang giao",
-  "Hoàn thành",
-  "Yêu cầu hoàn",
-  "Hoàn hàng",
-  "Hủy hàng",
-];
+const statusLabel = {
+  CHO_XAC_NHAN: "Chờ xác nhận",
+  DANG_CHUAN_BI: "Đang chuẩn bị hàng",
+  DANG_GIAO: "Đang giao",
+  HOAN_THANH: "Hoàn thành",
+  YEU_CAU_HOAN: "Yêu cầu hoàn",
+  HOAN_HANG: "Hoàn hàng",
+  HUY_HANG: "Hủy hàng",
+};
 
 const Orders = () => {
   const { orders, fetchOrders, handleUpdateOrderStatus } = useOrder();
@@ -39,8 +39,8 @@ const Orders = () => {
     const result = await handleUpdateOrderStatus(orderId, newStatus);
     if (result.EC === 0) {
       const updatedOrders = ordersState.map((order) => {
-        if (order._id === orderId) {
-          return { ...order, order_status: newStatus };
+        if (order.id === orderId) {
+          return { ...order, orderStatus: newStatus };
         }
         return order;
       });
@@ -51,10 +51,10 @@ const Orders = () => {
 
   const filteredOrders = ordersState.filter((order) => {
     const matchesStatus = filterStatus
-      ? order.order_status === filterStatus
+      ? order.orderStatus === filterStatus
       : true;
     const matchesSearch = searchText
-      ? order._id.toLowerCase().includes(searchText.toLowerCase())
+      ? order.id.toLowerCase().includes(searchText.toLowerCase())
       : true;
     return matchesStatus && matchesSearch;
   });
@@ -62,8 +62,8 @@ const Orders = () => {
   const columns = [
     {
       title: "Mã đơn",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
     },
     {
       title: "Sản phẩm",
@@ -81,41 +81,40 @@ const Orders = () => {
     },
     {
       title: "Khách hàng",
-      dataIndex: "user_id",
-      key: "user_id",
+      dataIndex: "userId",
+      key: "userId",
     },
     {
       title: "Hình thức",
-      dataIndex: "order_payment_method",
-      key: "order_payment_method",
-      render: (value) => value.toUpperCase(),
+      dataIndex: "orderPaymentMethod",
+      key: "orderPaymentMethod",
+      render: (value) => value?.toUpperCase(),
     },
     {
       title: "Tổng tiền",
-      dataIndex: "order_total_final",
-      key: "order_total_final",
-      render: (value) => `${value.toLocaleString()}đ`,
+      dataIndex: "orderTotalFinal",
+      key: "orderTotalFinal",
+      render: (value) => `${value?.toLocaleString()}đ`,
     },
     {
       title: "Trạng thái",
-      dataIndex: "order_status",
-      key: "order_status",
+      dataIndex: "orderStatus",
+      key: "orderStatus",
       render: (status, record) => (
         <Select
           value={status}
-          onChange={(newStatus) => {
-            handleStatusChange(record._id, newStatus);
-          }}
+          onChange={(newStatus) => handleStatusChange(record.id, newStatus)}
           className="min-w-[200px]"
           onClick={(e) => e.stopPropagation()}
         >
-          {statusOrder.map((s) => (
-            <Option key={s} value={s}>
-              {s}
+          {Object.entries(statusLabel).map(([code, label]) => (
+            <Option key={code} value={code}>
+              {label}
             </Option>
           ))}
         </Select>
       ),
+
       onCell: () => ({
         onClick: (e) => {
           // Chỉ ngăn chặn sự kiện click không lan truyền lên hàng
@@ -152,9 +151,9 @@ const Orders = () => {
             allowClear
             className="w-[300px]"
           >
-            {statusOrder.map((status, index) => (
-              <Option key={index} value={status}>
-                {status}
+            {Object.entries(statusLabel).map(([code, label]) => (
+              <Option key={code} value={code}>
+                {label}
               </Option>
             ))}
           </Select>
@@ -170,9 +169,9 @@ const Orders = () => {
           dataSource={filteredOrders}
           columns={columns}
           pagination={{ pageSize: 5 }}
-          rowKey="_id"
+          rowKey="id"
           onRow={(record) => ({
-            onClick: () => navigate(`/admin/order-details/${record._id}`),
+            onClick: () => navigate(`/admin/order-details/${record.id}`),
           })}
           scroll={{ x: "max-content" }}
           className="cursor-pointer"

@@ -12,7 +12,9 @@ import { usePopup } from "../../context/PopupContext";
 const { Option } = Select;
 
 const Categories = () => {
-  const [form] = Form.useForm();
+  const [formDad] = Form.useForm();
+  const [formChild] = Form.useForm();
+  const [formEdit] = Form.useForm();
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isAddDadCategoryModalVisible, setIsAddDadCategoryModalVisible] =
@@ -36,7 +38,7 @@ const Categories = () => {
 
   const filteredCategory = categories.filter((category) => {
     const matchesSearch = searchText
-      ? category.category_type.toLowerCase().includes(searchText.toLowerCase())
+      ? category.categoryType.toLowerCase().includes(searchText.toLowerCase())
       : true;
     return matchesSearch;
   });
@@ -44,7 +46,7 @@ const Categories = () => {
   useEffect(() => {
     const fetchCategoriesData = async () => {
       const user = await fetchUser();
-      if (user?.result?.role !== "admin") {
+      if (user?.result?.role !== "ADMIN") {
         window.location.href = "/sign-in";
       } else {
         fetchCategories();
@@ -67,59 +69,63 @@ const Categories = () => {
 
   const handleAddDadCategory = async () => {
     try {
-      await form.validateFields();
-      const newCategory = form.getFieldsValue();
+      await formDad.validateFields();
+      const newCategory = formDad.getFieldsValue();
 
       const res = await addCategory(newCategory);
       if (res?.data?.EC === 0) {
         fetchCategories();
-        form.resetFields();
+        formDad.resetFields();
         setIsAddDadCategoryModalVisible(false);
         showPopup("Thêm danh mục cha thành công");
       }
     } catch {
-      showPopup("Lỗi khi thêm danh mục cha", false);
+      // showPopup("Lỗi khi thêm danh mục cha", false);
+      return;
     }
   };
 
   const handleAddChildCategory = async () => {
     try {
-      await form.validateFields();
-      const newCategory = form.getFieldsValue();
+      await formChild.validateFields();
+      const newCategory = formChild.getFieldsValue();
 
       const parentCategory = categories.find(
-        (cat) => cat._id === newCategory.category_parent_id
+        (cat) => cat.id === newCategory.categoryParentId
       );
-      newCategory.category_gender = parentCategory?.category_gender || null;
+      newCategory.categoryGender = parentCategory?.categoryGender || null;
       const res = await addCategory(newCategory);
+      console.log("res", res);
       if (res?.data?.EC === 0) {
         fetchCategories();
-        form.resetFields();
+        formChild.resetFields();
         setIsAddChildCategoryModalVisible(false);
         showPopup("Thêm danh mục con thành công");
       }
     } catch {
-      showPopup("Lỗi khi thêm danh mục con", false);
+      // showPopup("Lỗi khi thêm danh mục con", false);
+      return;
     }
   };
 
   const handleEditCategory = (record) => {
     if (record) {
       setSelectedCategory(record); // Cập nhật giá trị discount được chọn
-      form.setFieldsValue(record); // Điền thông tin discount vào form
+      formEdit.setFieldsValue(record); // Điền thông tin discount vào form
       setIsEditCategoryModalVisible(true); // Mở modal chỉnh sửa
     } else {
-      showPopup("Không có danh mục được chọn", false);
+      // showPopup("Không có danh mục được chọn", false);
+      return;
     }
   };
 
   const handleUpdate = async () => {
     try {
-      await form.validateFields();
-      const updateData = form.getFieldsValue();
+      await formEdit.validateFields();
+      const updateData = formEdit.getFieldsValue();
       if (
-        updateData.category_level === 1 &&
-        updateData.category_parent_id !== null
+        updateData.categoryLevel === 1 &&
+        updateData.categoryParentId !== null
       ) {
         setIsEditCategoryModalVisible(false);
         showPopup("Danh mục cấp 1 không thể có danh mục cha", false);
@@ -127,17 +133,17 @@ const Categories = () => {
       }
 
       if (
-        updateData.category_level >= 2 &&
-        updateData.category_parent_id === null
+        updateData.categoryLevel >= 2 &&
+        updateData.categoryParentId === null
       ) {
         showPopup("Danh mục cấp 2 phải có danh mục cha", false);
         return;
       }
 
-      const res = await handleUpdateCategory(selectedCategory._id, updateData);
+      const res = await handleUpdateCategory(selectedCategory.id, updateData);
       if (res?.data?.EC === 0) {
         fetchCategories();
-        form.resetFields();
+        formEdit.resetFields();
         setIsEditCategoryModalVisible(false);
         showPopup("Sửa danh mục thành công");
       }
@@ -149,18 +155,18 @@ const Categories = () => {
   const columns = [
     {
       title: "Mã danh mục",
-      dataIndex: "_id",
-      key: "_id",
+      dataIndex: "id",
+      key: "id",
     },
     {
       title: "Loại danh mục",
-      dataIndex: "category_type",
-      key: "category_type",
+      dataIndex: "categoryType",
+      key: "categoryType",
     },
     {
       title: "Giới tính",
-      dataIndex: "category_gender",
-      key: "category_gender",
+      dataIndex: "categoryGender",
+      key: "categoryGender",
       render: (gender) => {
         const genderMap = {
           Nam: "Nam",
@@ -229,7 +235,7 @@ const Categories = () => {
           dataSource={filteredCategory}
           columns={columns}
           pagination={{ pageSize: 8 }}
-          rowKey="_id"
+          rowKey="id"
           scroll={{ x: "max-content" }}
         />
       </div>
@@ -255,17 +261,17 @@ const Categories = () => {
         cancelText="Hủy"
       >
         <Form
-          form={form}
+          form={formDad}
           layout="vertical"
           onFinish={handleAddDadCategory}
           initialValues={{
-            category_level: 1,
-            category_parent_id: null,
+            categoryLevel: 1,
+            categoryParentId: null,
           }}
         >
           <Form.Item
             label="Giới tính"
-            name="category_gender"
+            name="categoryGender"
             rules={[{ required: true, message: "Giới tính là bắt buộc" }]}
           >
             <Select placeholder="Chọn giới tính" allowClear>
@@ -276,14 +282,14 @@ const Categories = () => {
           </Form.Item>
           <Form.Item
             label="Level"
-            name="category_level"
+            name="categoryLevel"
             rules={[{ required: true, message: "Level là bắt buộc" }]}
           >
-            <InputNumber min={1} />
+            <InputNumber min={1} defaultValue={1} />
           </Form.Item>
           <Form.Item
             label="Loại danh mục"
-            name="category_type"
+            name="categoryType"
             rules={[{ required: true, message: "Loại danh mục là bắt buộc" }]}
           >
             <Input />
@@ -299,34 +305,38 @@ const Categories = () => {
         cancelText="Hủy"
       >
         <Form
-          form={form}
+          form={formChild}
           layout="vertical"
           onFinish={handleAddChildCategory}
           initialValues={{
-            category_level: 2,
+            categoryLevel: 2,
           }}
         >
           <Form.Item
             label="Level"
-            name="category_level"
+            name="categoryLevel"
             rules={[{ required: true, message: "Level là bắt buộc" }]}
           >
-            <InputNumber min={2} />
+            <InputNumber min={2} defaultValue={2} />
           </Form.Item>
-          <Form.Item label="Thuộc danh mục" name="category_parent_id">
+          <Form.Item
+            label="Thuộc danh mục"
+            name="categoryParentId"
+            rules={[{ required: true, message: "Vui lòng chọn danh mục cha" }]}
+          >
             <Select placeholder="Chọn danh mục" allowClear>
               {categories
-                ?.filter((category) => category.category_level === 1)
+                ?.filter((category) => category.categoryLevel === 1)
                 .map((category) => (
-                  <Option key={category._id} value={category._id}>
-                    {category.category_type} - {category.category_gender}
+                  <Option key={category.id} value={category.id}>
+                    {category.categoryType} - {category.categoryGender}
                   </Option>
                 ))}
             </Select>
           </Form.Item>
           <Form.Item
             label="Loại danh mục"
-            name="category_type"
+            name="categoryType"
             rules={[{ required: true, message: "Loại danh mục là bắt buộc" }]}
           >
             <Input />
@@ -342,14 +352,14 @@ const Categories = () => {
         cancelText="Hủy"
       >
         <Form
-          form={form}
+          form={formEdit}
           layout="vertical"
           initialValues={selectedCategory}
           onFinish={handleUpdate}
         >
           <Form.Item
             label="Giới tính"
-            name="category_gender"
+            name="categoryGender"
             rules={[{ required: true, message: "Giới tính là bắt buộc" }]}
           >
             <Select placeholder="Chọn giới tính" allowClear>
@@ -360,23 +370,23 @@ const Categories = () => {
           </Form.Item>
           <Form.Item
             label="Level"
-            name="category_level"
+            name="categoryLevel"
             rules={[{ required: true, message: "Level là bắt buộc" }]}
           >
-            <InputNumber min={1} />
+            <InputNumber min={1} defaultValue={1} />
           </Form.Item>
-          <Form.Item label="Thuộc danh mục" name="category_parent_id">
+          <Form.Item label="Thuộc danh mục" name="categoryParentId">
             <Select placeholder="Chọn danh mục" allowClear>
               {categories?.map((category) => (
-                <Option key={category._id} value={category._id}>
-                  {category.category_type}
+                <Option key={category.id} value={category.id}>
+                  {category.categoryType} - {category.categoryGender}
                 </Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item
             label="Loại danh mục"
-            name="category_type"
+            name="categoryType"
             rules={[{ required: true, message: "Loại danh mục là bắt buộc" }]}
           >
             <Input />

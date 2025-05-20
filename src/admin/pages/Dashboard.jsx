@@ -63,8 +63,8 @@ function Dashboard() {
   const totalRevenue = () => {
     if (!orders) return 0;
     return orders.reduce((acc, order) => {
-      if (order.is_paid && order.order_status === "Hoàn thành") {
-        return acc + order.order_total_final;
+      if (order.isPaid && order.orderStatus === "HOAN_THANH") {
+        return acc + order.orderTotalFinal;
       }
       return acc;
     }, 0);
@@ -75,6 +75,7 @@ function Dashboard() {
     totalOrders: orders?.length || 0,
     totalUsers: users?.length || 0,
   };
+
   // Dữ liệu cho biểu đồ đường
   const lineOptions = {
     chart: { type: "area" },

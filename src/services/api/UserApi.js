@@ -11,7 +11,7 @@ export const getUser = async () => {
 
 export const getAllUsers = async () => {
   try {
-    const response = await AxiosInstance.get("/user/get_all_user");
+    const response = await AxiosInstance.get("/user/get-all-user");
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";
@@ -20,7 +20,7 @@ export const getAllUsers = async () => {
 
 export const changePassword = async (oldPassword, newPassword) => {
   try {
-    const response = await AxiosInstance.patch("/user/change_password", {
+    const response = await AxiosInstance.patch("/user/change-password", {
       oldPassword,
       newPassword,
     });

@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogin = async (user_name, password) => {
     const data = await login(user_name, password);
-    console.log("data", data)
     // if (data?.result?.accessToken && data?.result?.refreshToken) {
     //   setToken(data?.result?.accessToken);
     //   localStorage.setItem("accessToken", data.result.accessToken);

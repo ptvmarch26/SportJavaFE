@@ -59,8 +59,8 @@ export const DiscountProvider = ({ children }) => {
     return res;
   };
   
-  const fetchDiscountForOrder = async (product_id) => {
-    const response = await getDiscountForOrder(product_id);
+  const fetchDiscountForOrder = async (productIds) => {
+    const response = await getDiscountForOrder(productIds);
     setDiscounts(response?.result);
     return response;
   }

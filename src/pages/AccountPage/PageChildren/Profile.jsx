@@ -41,10 +41,10 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
-    // setLoading(true, "Đang đổi thông tin");
+    setLoading(true, "Đang đổi thông tin");
     const form = new FormData();
-    form.append("username", formData.username);
-    form.append("fullName", formData.fullName);
+    form.append("username", formData.user_name);
+    form.append("fullName", formData.full_name);
     form.append("birth", formData.birth);
     form.append("gender", formData.gender);
 
@@ -101,7 +101,7 @@ const Profile = () => {
     }
   };
 
-  console.log("selec", selectedUser)
+  // console.log("selec", selectedUser);
 
   return (
     <div className="lg:px-6 bg-white">
@@ -227,7 +227,7 @@ const Profile = () => {
             <option value="Nữ" className="text-gray-700">
               Nữ
             </option>
-            <option value="Khác" className="text-gray-700">
+            <option value="Unisex" className="text-gray-700">
               Khác
             </option>
           </select>

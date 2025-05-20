@@ -440,7 +440,7 @@ const Header = () => {
                   <div className="flex items-center cursor-pointer">
                     <Link to="/account">
                       <img
-                        src={selectedUser?.avt_img || avatar_false}
+                        src={selectedUser?.avtimg || avatar_false}
                         alt="User avatar"
                         className="w-7 h-7 rounded-full ml-1"
                       />
