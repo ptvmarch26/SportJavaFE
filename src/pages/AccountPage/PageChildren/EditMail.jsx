@@ -32,7 +32,6 @@ const EditEmail = () => {
   const handleVerifyCode = async (otp) => {
     const enteredCode = otp.join("");
     const res = await handleVerifyOTP(selectedUser?.email, enteredCode);
-    console.log("res", res);
     if (res?.EC === 0) {
       await handleUpdateUser({ email: newEmail });
       await fetchUser();

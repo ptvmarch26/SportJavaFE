@@ -128,7 +128,14 @@ function CheckoutPage() {
       return;
     }
     if (!productId && cart?.products) {
-      setCartItems(cart.products);
+      setCartItems(
+        cart.products.map((product) => ({
+          colorName: product.colorName,
+          variantName: product.variantName,
+          quantity: product.quantity,
+          productId: product.product,
+        }))
+      );
     }
   }, [cart, productId]);
 
@@ -339,7 +346,6 @@ function CheckoutPage() {
     };
 
     const res = await handleCreateOrder(orderData);
-    console.log("ré", res);
     if (res?.EC === 0 && selectedPayment === "PAYPAL") {
       showPopup("Đặt hàng thành công, chuyển hướng tới trang thanh toán");
       setTimeout(() => {

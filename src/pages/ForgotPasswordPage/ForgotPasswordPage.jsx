@@ -33,7 +33,6 @@ const ForgotPasswordPage = () => {
     setOtpError("");
     setLoading(true, "Vui lòng chờ")
     const res = await handleSendOTP(email);
-    console.log("res", res);
     if (res?.EC === 0) {
       setStep(1);
     } else {
@@ -53,7 +52,6 @@ const ForgotPasswordPage = () => {
     setOtpError("");
 
     const res = await handleVerifyOTP(email, otpString);
-    console.log("veryfy", res);
     if (res?.EC === 0) {
       setStep(2);
     } else {
@@ -81,7 +79,6 @@ const ForgotPasswordPage = () => {
     }
 
     const res = await handleResetPassword(email, newPassword);
-    console.log("aaaa", res);
     if (res?.EC === 0) {
       showPopup("Đổi mật khẩu thành công. Vui lòng đăng nhập lại", true, 1000);
       navigate("/sign-in");

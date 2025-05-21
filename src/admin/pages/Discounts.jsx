@@ -99,6 +99,10 @@ const Discounts = () => {
   };
 
   const filteredDiscounts = discounts.filter((discount) => {
+    if (!discount || !discount.discountStartDay || !discount.discountEndDay) {
+      return false;
+    }
+
     const status = calculateStatus(
       discount.discountStartDay,
       discount.discountEndDay

@@ -21,11 +21,11 @@ export const CartProvider = ({ children }) => {
 
   const handleAddToCart = async (
     productId,
-    color_name,
-    variant_name,
+    colorName,
+    variantName,
     quantity
   ) => {
-    return await addToCart(productId, color_name, variant_name, quantity);
+    return await addToCart(productId, colorName, variantName, quantity);
   };
 
   const handleRemoveFromCart = async (productId, color_name, variant_name) => {

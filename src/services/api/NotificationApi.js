@@ -26,7 +26,7 @@ export const readNotification = async (notificationId) => {
 export const getUserNotifications = async () => {
   try {
     const response = await AxiosInstance.get(
-      "/notification/get-user-notifications/"
+      "/notification/get-user-notifications"
     );
     return response.data;
   } catch (error) {

@@ -3,56 +3,53 @@ import { Button } from "@material-tailwind/react";
 import AccountInfoComponent from "../../components/AccountInfoComponent/AccountInfoComponent";
 import { IoTrashOutline } from "react-icons/io5";
 import { useNotifications } from "../../context/NotificationContext";
-import { readNotification, deleteNotification } from "../../services/api/NotificationApi";
+import {
+  readNotification,
+  deleteNotification,
+} from "../../services/api/NotificationApi";
 import { usePopup } from "../../context/PopupContext";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const NotificationPage = () => {
-  const { notifications, setNotifications } = useNotifications();
+  const { notifications, setNotifications, fetchNotifications } =
+    useNotifications();
   const { showPopup } = usePopup();
   const navigate = useNavigate();
   const markAllAsRead = async () => {
     const unreadNotifications = notifications.filter((n) => !n.isRead);
 
-    const updatedNotifications = [...notifications]; // tạo bản sao
+    await Promise.all(unreadNotifications.map((n) => readNotification(n.id)));
 
-    await Promise.all(
-      unreadNotifications.map(async (n) => {
-        const res = await readNotification(n._id);
-        if (res.EC === 0) {
-          const index = updatedNotifications.findIndex(
-            (item) => item._id === n._id
-          );
-          if (index !== -1) {
-            updatedNotifications[index].isRead = true;
-          }
-        }
-      })
-    );
-
-    setNotifications(updatedNotifications);
+    await fetchNotifications();
   };
 
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
   const handleNotificationClick = async (notification) => {
-    const res = await readNotification(notification._id);
+    const res = await readNotification(notification.id);
+
     if (res.EC === 0) {
-      setNotifications(
-        notifications.map((n) =>
-          n._id === notification._id ? { ...n, isRead: true } : n
-        )
-      );
-      if (notification.order_id)
-      navigate(`/orders/order-details/${notification.order_id}`);
-    } else showPopup(res.EM, false);
+      await fetchNotifications();
+
+      if (notification.orderId) {
+        navigate(`/orders/order-details/${notification.orderId}`);
+      } else if (notification.discountId) {
+        navigate(`/cart`);
+      }
+    } else {
+      showPopup(res.EM, false);
+    }
   };
 
   const handleDeleteNotification = async (id, e) => {
     e.stopPropagation();
     const res = await deleteNotification(id);
-    if (res.EC === 0)
-    {
+    if (res.EC === 0) {
       setNotifications(
-        notifications.filter((notification) => notification._id !== id)
+        notifications.filter((notification) => notification.id !== id)
       );
       showPopup(res.EM);
     } else showPopup(res.EM, false);
@@ -81,7 +78,7 @@ const NotificationPage = () => {
               </p>
             ) : (
               notifications.map((notification) => (
-                <div key={notification._id} className="mb-2">
+                <div key={notification.id} className="mb-2">
                   <div
                     className={clsx(
                       "p-4 mb-2 shadow-sm rounded-md cursor-pointer border border-gray-300 transition-all duration-300 relative",
@@ -95,7 +92,7 @@ const NotificationPage = () => {
                     <div
                       className="absolute top-2 right-2 text-red-500 hover:text-red-700 cursor-pointer p-2"
                       onClick={(e) =>
-                        handleDeleteNotification(notification._id, e)
+                        handleDeleteNotification(notification.id, e)
                       }
                     >
                       <IoTrashOutline size={20} />
@@ -103,16 +100,16 @@ const NotificationPage = () => {
 
                     <div className="flex items-center gap-4">
                       <img
-                        src={notification.img}
-                        alt={notification.notify_type}
+                        src={notification.imageUrl}
+                        alt={notification.notifyType}
                         className="w-20 h-20 rounded-md object-cover border"
                       />
                       <div>
                         <h6 className="font-semibold mr-10 sm:mr-0">
-                          {notification.notify_title}
+                          {notification.notifyTitle}
                         </h6>
                         <p className="text-sm text-gray-600">
-                          {notification.notify_desc}
+                          {notification.notifyDescription}
                         </p>
                       </div>
                     </div>

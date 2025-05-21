@@ -83,7 +83,6 @@ const Products = () => {
   };
 
   const handleEditProduct = async (record) => {
-    console.log("recird", record);
     setLoading(true, "Đang mở form sản phẩm");
     const productImages = await Promise.all(
       (Array.isArray(record.productImg)

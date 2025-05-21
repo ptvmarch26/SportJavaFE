@@ -30,8 +30,6 @@ const FeedbackComponent = ({ feedback }) => {
     setPreviewContent(null);
   };
 
-  console.log("fb", feedback);
-
   return (
     <div className="border-t border-gray-200 py-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
