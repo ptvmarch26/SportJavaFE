@@ -10,16 +10,16 @@ export const getCart = async () => {
 };
 
 export const addToCart = async (
-  product_id,
-  color_name,
-  variant_name,
+  productId,
+  colorName,
+  variantName,
   quantity
 ) => {
   try {
     const res = await AxiosInstance.post("/cart", {
-      product_id,
-      color_name,
-      variant_name,
+      productId,
+      colorName,
+      variantName,
       quantity,
     });
     return res.data;
@@ -28,10 +28,10 @@ export const addToCart = async (
   }
 };
 
-export const removeFromCart = async (productId, color_name, variant_name) => {
+export const removeFromCart = async (productId, colorName, variantName) => {
   try {
-    const res = await AxiosInstance.delete(`/cart/${productId}`, {
-      data: { color_name, variant_name },
+    const res = await AxiosInstance.delete(`/cart/item`, {
+      data: { productId, colorName, variantName },
     });
     return res.data;
   } catch (error) {
@@ -48,12 +48,12 @@ export const clearCart = async () => {
   }
 };
 
-export const decreaseQuantity = async (productId, color_name, variant_name) => {
+export const decreaseQuantity = async (productId, colorName, variantName) => {
   try {
-    const res = await AxiosInstance.patch("/cart/decrease_quantity", {
+    const res = await AxiosInstance.patch("/cart/decrease-quantity", {
       productId,
-      color_name,
-      variant_name,
+      colorName,
+      variantName,
     });
     return res.data;
   } catch (error) {

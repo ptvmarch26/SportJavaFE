@@ -278,8 +278,6 @@ const SidebarSortComponent = ({ isOpen, onClose, onFilterChange }) => {
     setPriceCheckTimeout(newTimeout);
   };
 
-  // console.log("category", categories);
-
   return (
     <div
       className={`fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity ${

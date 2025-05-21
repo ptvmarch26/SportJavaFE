@@ -95,7 +95,6 @@ const Categories = () => {
       );
       newCategory.categoryGender = parentCategory?.categoryGender || null;
       const res = await addCategory(newCategory);
-      console.log("res", res);
       if (res?.data?.EC === 0) {
         fetchCategories();
         formChild.resetFields();

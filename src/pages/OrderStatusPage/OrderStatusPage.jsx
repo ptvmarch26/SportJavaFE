@@ -69,7 +69,6 @@ const OrderStatusPage = () => {
   const confirmCancelOrder = async () => {
     if (selectedOrder) {
       const result = await handleUpdateOrderStatus(selectedOrder, "HUY_HANG");
-      console.log("re", result);
       if (result.EC === 0) {
         setOrders((prevOrders) =>
           prevOrders.map((order) =>

@@ -60,8 +60,6 @@ const ProductPage = () => {
     fetchFavourites();
   }, [token]);
 
-  // console.log("filter", selectedFilters);
-
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isSortOpen, setSortOpen] = useState(false);
   const [sortText, setSortText] = useState("Lọc theo");

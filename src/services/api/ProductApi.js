@@ -135,10 +135,6 @@ export const updateProduct = async (productId, productData) => {
       }
     });
   }
-  console.log("==== FormData Contents ====", productId);
-  for (let pair of formData.entries()) {
-    console.log(`${pair[0]}:`, pair[1]);
-  }
   try {
     const response = await AxiosInstance.patch(
       `/product/update/${productId}`,

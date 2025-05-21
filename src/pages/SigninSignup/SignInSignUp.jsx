@@ -156,7 +156,6 @@ const SignInSignUp = () => {
       return;
     }
     const result = await handleLogin(userName, password);
-    console.log("re", result);
     if (result.EC === 0 && result?.result?.accessToken) {
       showPopup(result.EM);
       localStorage.removeItem("compareList");

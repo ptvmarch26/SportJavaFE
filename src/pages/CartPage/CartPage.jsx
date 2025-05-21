@@ -3,6 +3,7 @@ import CartItemComponent from "../../components/CartItemComponent/CartItemCompon
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import ConfirmDialogComponent from "../../components/ConfirmDialogComponent/ConfirmDialogComponent";
+import { usePopup } from "../../context/PopupContext";
 
 const CartPage = () => {
   const {
@@ -14,7 +15,7 @@ const CartPage = () => {
     handleAddToCart,
     handleClearCart,
   } = useCart();
-
+  const { showPopup } = usePopup();
   useEffect(() => {
     fetchCart();
   }, []);
@@ -27,15 +28,15 @@ const CartPage = () => {
 
   const subtotal =
     cartItems?.reduce((acc, item) => {
-      const selectedColor = item?.product_id?.colors.find(
-        (color) => color.color_name === item.color_name
+      const selectedColor = item?.product?.colors.find(
+        (color) => color.colorName === item.colorName
       );
 
       const selectedVariant = selectedColor?.variants.find(
-        (variant) => variant.variant_size === item.variant_name
+        (variant) => variant.variantSize === item.variantName
       );
 
-      return acc + selectedVariant?.variant_price * item.quantity;
+      return acc + selectedVariant?.variantPrice * item.quantity;
     }, 0) || 0;
 
   const handleNavigateCheckout = () => {
@@ -46,19 +47,15 @@ const CartPage = () => {
   const confirmRemoveItem = () => {
     const item = selectedItemToRemove;
     if (item) {
-      handleRemoveFromCart(
-        item.product?._id,
-        item.color_name,
-        item.variant_name
-      );
+      handleRemoveFromCart(item.productId, item.colorName, item.variantName);
       setCart((prevCart) => ({
         ...prevCart,
         products: prevCart.products.filter(
           (cartItem) =>
             !(
-              cartItem.product_id?._id === item.product_id?._id &&
-              cartItem.color_name === item.color_name &&
-              cartItem.variant_name === item.variant_name
+              cartItem.productId === item.productId &&
+              cartItem.colorName === item.colorName &&
+              cartItem.variantName === item.variantName
             )
         ),
       }));
@@ -102,39 +99,54 @@ const CartPage = () => {
                 key={index}
                 item={item}
                 onRemove={() => setSelectedItemToRemove(item)}
-                onDecrease={() => {
-                  const newQuantity = item.quantity - 1;
+                onDecrease={async (productId, newQuantity) => {
                   if (newQuantity > 0) {
-                    handleDecreaseQuantity(
-                      item?.product_id?._id,
-                      item?.color_name,
-                      item?.variant_name
+                    await handleDecreaseQuantity(
+                      productId,
+                      item.colorName,
+                      item.variantName,
+                      1
                     );
                     setCart((prevCart) => ({
                       ...prevCart,
                       products: prevCart.products.map((cartItem) =>
-                        cartItem.product_id?._id === item.product_id?._id &&
-                        cartItem.color_name === item.color_name &&
-                        cartItem.variant_name === item.variant_name
+                        cartItem.productId === item.productId &&
+                        cartItem.colorName === item.colorName &&
+                        cartItem.variantName === item.variantName
                           ? { ...cartItem, quantity: newQuantity }
                           : cartItem
                       ),
                     }));
                   }
                 }}
-                onIncrease={() => {
-                  const newQuantity = item.quantity + 1;
-                  handleAddToCart(
-                    item?.product_id?._id,
-                    item?.color_name,
-                    item?.variant_name
+                onIncrease={async (productId, newQuantity) => {
+                  const selectedColor = item.product?.colors.find(
+                    (color) => color.colorName === item.colorName
+                  );
+
+                  const selectedVariant = selectedColor?.variants.find(
+                    (variant) => variant.variantSize === item.variantName
+                  );
+
+                  const maxStock = selectedVariant?.variantCountInStock || 0;
+
+                  if (newQuantity > maxStock) {
+                    showPopup("Số lượng vượt quá tồn kho", false);
+                    return;
+                  }
+
+                  await handleAddToCart(
+                    productId,
+                    item.colorName,
+                    item.variantName,
+                    1
                   );
                   setCart((prevCart) => ({
                     ...prevCart,
                     products: prevCart.products.map((cartItem) =>
-                      cartItem.product_id?._id === item.product_id?._id &&
-                      cartItem.color_name === item.color_name &&
-                      cartItem.variant_name === item.variant_name
+                      cartItem.productId === item.productId &&
+                      cartItem.colorName === item.colorName &&
+                      cartItem.variantName === item.variantName
                         ? { ...cartItem, quantity: newQuantity }
                         : cartItem
                     ),

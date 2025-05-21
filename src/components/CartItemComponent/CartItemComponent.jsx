@@ -7,9 +7,13 @@ import { getFavourite, updateFavourite } from "../../services/api/FavouriteApi";
 const CartItemComponent = ({ item, onRemove, onIncrease, onDecrease }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
+  const increaseQuantity = () => {
+    onIncrease?.(item?.productId, item.quantity + 1);
+  };
+
   const decreaseQuantity = () => {
     if (item.quantity > 1) {
-      onDecrease(item?._id, item.quantity - 1);
+      onDecrease?.(item?.productId, item.quantity - 1);
     }
   };
 
@@ -18,60 +22,54 @@ const CartItemComponent = ({ item, onRemove, onIncrease, onDecrease }) => {
       const favouritesData = await getFavourite();
 
       if (favouritesData && favouritesData.result) {
-        setIsFavorite(favouritesData.result.includes(item.product_id?._id));
+        setIsFavorite(favouritesData.result.includes(item.productId));
       }
     };
 
     fetchFavoriteStatus();
-  }, [item.product_id?._id]);
+  }, [item.productId]);
 
   const toggleFavorite = async () => {
     setIsFavorite(!isFavorite);
-    await updateFavourite(item.product_id?._id);
+    await updateFavourite(item.productId);
   };
-
-  const increaseQuantity = () => {
-    onIncrease(item?._id, item.quantity + 1);
-  };
-
-  const selectedColor = item?.product_id?.colors.find(
-    (color) => color.color_name === item.color_name
+  const selectedColor = item?.product?.colors.find(
+    (color) => color.colorName === item.colorName
   );
 
   const selectedVariant = selectedColor?.variants.find(
-    (variant) => variant.variant_size === item.variant_name
+    (variant) => variant.variantSize === item.variantName
   );
 
   const imageToDisplay =
-    selectedVariant?.imgs?.img_main ||
-    selectedColor?.imgs?.img_main ||
-    item?.product_id?.product_img;
-
+    selectedVariant?.imgs?.imgMain ||
+    selectedColor?.imgs?.imgMain ||
+    item?.product?.productImg;
   return (
     <>
       <div
-        onClick={() => navigate(`/product/${item.product_id?._id}`)}
+        onClick={() => navigate(`/product/${item.productId}`)}
         className="flex gap-4 cursor-pointer"
       >
         <img
           src={imageToDisplay}
-          alt={item?.product_id?.product_title}
+          alt={item?.product?.productTitle}
           className="w-28 h-28 object-cover"
         />
         <div className="flex-1 space-y-2">
           <h2 className="font-semibold line-clamp-2">
-            {item?.product_id?.product_title}
+            {item?.product?.productTitle}
           </h2>
           <div className="flex items-center">
-            {item.product_id?.product_percent_discount > 0 ? (
+            {item.product?.productPercentDiscount > 0 ? (
               <div>
                 <p className="text-md font-bold text-[#ba2b20] mr-4">
-                  {selectedVariant.variant_price?.toLocaleString()}₫
+                  {selectedVariant.variantPrice?.toLocaleString()}₫
                 </p>
                 <p className="text-md font-weight text-[#9ca3af] line-through mr-4">
                   {(
-                    selectedVariant.variant_price /
-                    (1 - item.product_id?.product_percent_discount / 100)
+                    selectedVariant.variantPrice /
+                    (1 - item.product?.productPercentDiscount / 100)
                   ).toLocaleString()}
                   đ
                 </p>
@@ -79,15 +77,15 @@ const CartItemComponent = ({ item, onRemove, onIncrease, onDecrease }) => {
             ) : (
               <p className="text-md font-bold text-[#ba2b20] mr-4">
                 {(
-                  selectedVariant?.variant_price /
-                  (1 - item.product_id?.product_percent_discount / 100)
+                  selectedVariant?.variantPrice /
+                  (1 - item.product?.productPercentDiscount / 100)
                 ).toLocaleString()}
                 đ
               </p>
             )}
           </div>
           <p className="text-md">
-            {selectedColor?.color_name} - Size {selectedVariant?.variant_size}{" "}
+            {selectedColor?.colorName} - Size {selectedVariant?.variantSize}{" "}
           </p>
         </div>
         <div className="flex flex-col gap-2">

@@ -65,8 +65,6 @@ const OrderDetails = () => {
     shippingAddress,
   } = orderDetails;
 
-  console.log("ỏ", orderDetails);
-
   const formattedProducts = products.map((product) => {
     const colorData = product.product?.colors.find(
       (color) => color.colorName === product.colorName
@@ -137,8 +135,6 @@ const OrderDetails = () => {
         `${(record.product_price * record.quantity)?.toLocaleString()}`,
     },
   ];
-
-  console.log("paymentInfo", paymentInfo);
 
   return (
     <div className="lg:ml-[300px] mt-[64px] px-2 py-4 lg:p-6 min-h-screen bg-gray-100">

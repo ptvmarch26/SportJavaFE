@@ -53,7 +53,6 @@ const Profile = () => {
     }
 
     const res = await handleUpdateUser(form);
-    console.log("res", res);
     if (res?.EC === 0) {
       fetchUser();
       setOriginalData(formData);
@@ -100,8 +99,6 @@ const Profile = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  // console.log("selec", selectedUser);
 
   return (
     <div className="lg:px-6 bg-white">

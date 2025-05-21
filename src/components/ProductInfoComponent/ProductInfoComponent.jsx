@@ -91,10 +91,11 @@ const ProductInfoComponent = ({ product }) => {
       selectedSize,
       quantity
     );
+
     if (res.EC === 0) {
       const existingIndex = cart.products.findIndex(
         (item) =>
-          item.product_id._id === product._id &&
+          item.productId === product.id &&
           item.colorName === selectedColor &&
           item.variantName === selectedSize
       );
@@ -106,9 +107,9 @@ const ProductInfoComponent = ({ product }) => {
         updatedProducts[existingIndex].quantity += quantity;
       } else {
         const newProduct = {
-          product_id: product,
-          color_name: selectedColor,
-          variant_name: selectedSize,
+          productId: product.id,
+          colorName: selectedColor,
+          variantName: selectedSize,
           quantity,
         };
         updatedProducts.push(newProduct);
@@ -142,8 +143,8 @@ const ProductInfoComponent = ({ product }) => {
 
   const increaseQuantity = () => {
     const maxStock =
-      availableVariants.find((v) => v.variant_size === selectedSize)
-        ?.variant_countInStock ?? 0;
+      availableVariants.find((v) => v.variantSize === selectedSize)
+        ?.variantCountInStock ?? 0;
 
     if (quantity < maxStock) {
       setQuantity(quantity + 1);
@@ -206,8 +207,6 @@ const ProductInfoComponent = ({ product }) => {
       thumbSliderRef.current.slickGoTo(index);
     }
   };
-
-  // console.log("pr", product);
 
   return (
     <div className="flex flex-col lg:flex-row lg:p-10 gap-10">
