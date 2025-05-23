@@ -270,7 +270,6 @@ function CheckoutPage() {
       ].filter(Boolean)
     );
   };
-  console.log("se", selectedUser);
 
   const closeOverlay = () => setIsOverlayOpen(false);
 
@@ -358,6 +357,7 @@ function CheckoutPage() {
       })),
       orderPaymentMethod: selectedPayment,
       orderNote: "",
+      email: addresses.length > 0 ? selectedUser?.email : newAddress.email,
       discountIds: selectedVouchers,
     };
 
@@ -372,12 +372,7 @@ function CheckoutPage() {
     if (res?.EC === 0) {
       setCart([]);
       navigate(
-        `/orders/order-details/${res.result.id}?code=00&status=SUCCESS&cancel=false`,
-        {
-          state: {
-            email: selectedUser?.email || newAddress.email,
-          },
-        }
+        `/orders/order-details/${res.result.id}?code=00&status=SUCCESS&cancel=false`
       );
       return;
     }
@@ -407,7 +402,7 @@ function CheckoutPage() {
                 setNewAddress={setNewAddress}
                 formErrors={formErrors}
                 setFormErrors={setFormErrors}
-                showEmail={!selectedUser}
+                showEmail={addresses.length === 0}
               />
             )}
             {selectedAddress && (

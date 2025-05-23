@@ -5,7 +5,7 @@ import avt_false from "../../../assets/images/avatar-false.jpg";
 import { useLoading } from "../../../context/LoadingContext";
 
 const Profile = () => {
-  const { selectedUser, fetchUser, handleUpdateUser } = useUser();
+  const { selectedUser, fetchUser, handleUpdateUserProfile } = useUser();
   const [avatarFile, setAvatarFile] = useState(null);
   const { setLoading } = useLoading();
 
@@ -52,7 +52,7 @@ const Profile = () => {
       form.append("avatarimg", avatarFile); // <- tên phải trùng với `multer` backend
     }
 
-    const res = await handleUpdateUser(form);
+    const res = await handleUpdateUserProfile(form);
     if (res?.EC === 0) {
       fetchUser();
       setOriginalData(formData);

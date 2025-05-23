@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaLock, FaUser } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { Button } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,7 +7,8 @@ import { IoIosArrowBack, IoIosEye, IoIosEyeOff } from "react-icons/io";
 import OTPComponent from "../../components/OTPComponent/OTPComponent";
 import { useAuth } from "../../context/AuthContext";
 import { usePopup } from "../../context/PopupContext";
-import { useLoading } from "../../context/LoadingContext"
+import { useLoading } from "../../context/LoadingContext";
+import { MdEmail } from "react-icons/md";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const ForgotPasswordPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [errors, setErrors] = useState({});
-   const { showPopup } = usePopup();
+  const { showPopup } = usePopup();
 
   const handleSendOtp = async () => {
     if (!email.trim()) {
@@ -31,7 +32,7 @@ const ForgotPasswordPage = () => {
     }
     setError("");
     setOtpError("");
-    setLoading(true, "Vui lòng chờ")
+    setLoading(true, "Vui lòng chờ");
     const res = await handleSendOTP(email);
     if (res?.EC === 0) {
       setStep(1);
@@ -112,16 +113,16 @@ const ForgotPasswordPage = () => {
                   htmlFor="email"
                   className="min-w-[170px] block antialiased font-sans text-sm mb-1 leading-normal text-inherit font-medium text-gray-900"
                 >
-                  Tài khoản
+                  Email
                 </label>
                 <div className="relative">
-                  <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700" />
+                  <MdEmail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700" />
                   <input
                     id="email"
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Số điện thoại/Email"
+                    placeholder="Email"
                     className={`peer w-full bg-transparent text-gray-700 font-sans font-normal outline-none focus:outline-none disabled:bg-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 border focus:border-2 border-t-gray-200 focus:border-t-primary placeholder:opacity-100 focus:placeholder:opacity-100 text-sm px-3 py-3 rounded-md border-gray-200 focus:border-gray-900 pl-10`}
                   />
                 </div>
@@ -147,94 +148,101 @@ const ForgotPasswordPage = () => {
 
           {step === 2 && (
             <div>
-              <div className="flex flex-col">
-                <div className="">
-                  <label
-                    htmlFor="newPassword"
-                    className="min-w-[170px] block antialiased font-sans text-sm mb-1 leading-normal text-inherit font-medium text-gray-900"
-                  >
-                    Mật khẩu mới
-                  </label>
-                  <div className="relative w-full">
-                    <FaLock className="absolute left-3 top-[37%] transform -translate-y-1/2 text-gray-700" />
-                    <input
-                      id="newPassword"
-                      type={showNewPassword ? "text" : "password"}
-                      placeholder="Nhập mật khẩu mới"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className={`mb-4 peer w-full bg-transparent text-gray-700 font-sans font-normal outline-none focus:outline-none disabled:bg-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 border focus:border-2 border-t-gray-200 focus:border-t-primary placeholder:opacity-100 focus:placeholder:opacity-100 text-sm px-3 py-3 rounded-md border-gray-200 focus:border-gray-900 pl-10 `}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-[37%] transform -translate-y-1/2"
-                    >
-                      {showNewPassword ? (
-                        <IoIosEyeOff className="w-5 h-5 text-gray-500" />
-                      ) : (
-                        <IoIosEye className="w-5 h-5 text-gray-500" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  {errors.newPassword && (
-                    <p className="text-red-500 text-sm mb-2 -mt-2">
-                      {errors.newPassword}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-col">
-                <div className="">
-                  <label
-                    htmlFor="confirmPassword"
-                    className="min-w-[170px] block antialiased font-sans text-sm mb-1 leading-normal text-inherit font-medium text-gray-900"
-                  >
-                    Xác nhận mật khẩu mới
-                  </label>
-                  <div className="relative w-full">
-                    <FaLock className="absolute left-3 top-[37%] transform -translate-y-1/2 text-gray-700" />
-                    <input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Xác nhận mật khẩu mới"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`mb-4 peer w-full bg-transparent text-gray-700 font-sans font-normal outline-none focus:outline-none disabled:bg-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 border focus:border-2 border-t-gray-200 focus:border-t-primary placeholder:opacity-100 focus:placeholder:opacity-100 text-sm px-3 py-3 rounded-md border-gray-200 focus:border-gray-900 pl-10 `}
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="absolute right-3 top-[37%] transform -translate-y-1/2"
-                    >
-                      {showConfirmPassword ? (
-                        <IoIosEyeOff className="w-5 h-5 text-gray-500" />
-                      ) : (
-                        <IoIosEye className="w-5 h-5 text-gray-500" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-sm mb-2 -mt-2">
-                      {errors.confirmPassword}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <Button
-                onClick={handleResetPasswordSubmit}
-                className="w-full h-12"
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleResetPasswordSubmit();
+                }}
               >
-                Đổi mật khẩu
-              </Button>
+                <div className="flex flex-col">
+                  <div className="">
+                    <label
+                      htmlFor="newPassword"
+                      className="min-w-[170px] block antialiased font-sans text-sm mb-1 leading-normal text-inherit font-medium text-gray-900"
+                    >
+                      Mật khẩu mới
+                    </label>
+                    <div className="relative w-full">
+                      <FaLock className="absolute left-3 top-[37%] transform -translate-y-1/2 text-gray-700" />
+                      <input
+                        id="newPassword"
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="Nhập mật khẩu mới"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className={`mb-4 peer w-full bg-transparent text-gray-700 font-sans font-normal outline-none focus:outline-none disabled:bg-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 border focus:border-2 border-t-gray-200 focus:border-t-primary placeholder:opacity-100 focus:placeholder:opacity-100 text-sm px-3 py-3 rounded-md border-gray-200 focus:border-gray-900 pl-10 `}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-[37%] transform -translate-y-1/2"
+                      >
+                        {showNewPassword ? (
+                          <IoIosEyeOff className="w-5 h-5 text-gray-500" />
+                        ) : (
+                          <IoIosEye className="w-5 h-5 text-gray-500" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    {errors.newPassword && (
+                      <p className="text-red-500 text-sm mb-2 -mt-2">
+                        {errors.newPassword}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col">
+                  <div className="">
+                    <label
+                      htmlFor="confirmPassword"
+                      className="min-w-[170px] block antialiased font-sans text-sm mb-1 leading-normal text-inherit font-medium text-gray-900"
+                    >
+                      Xác nhận mật khẩu mới
+                    </label>
+                    <div className="relative w-full">
+                      <FaLock className="absolute left-3 top-[37%] transform -translate-y-1/2 text-gray-700" />
+                      <input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Xác nhận mật khẩu mới"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={`mb-4 peer w-full bg-transparent text-gray-700 font-sans font-normal outline-none focus:outline-none disabled:bg-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 border focus:border-2 border-t-gray-200 focus:border-t-primary placeholder:opacity-100 focus:placeholder:opacity-100 text-sm px-3 py-3 rounded-md border-gray-200 focus:border-gray-900 pl-10 `}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-[37%] transform -translate-y-1/2"
+                      >
+                        {showConfirmPassword ? (
+                          <IoIosEyeOff className="w-5 h-5 text-gray-500" />
+                        ) : (
+                          <IoIosEye className="w-5 h-5 text-gray-500" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    {errors.confirmPassword && (
+                      <p className="text-red-500 text-sm mb-2 -mt-2">
+                        {errors.confirmPassword}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-12"
+                >
+                  Đổi mật khẩu
+                </Button>
+              </form>
             </div>
           )}
         </motion.div>
