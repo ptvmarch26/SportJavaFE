@@ -11,8 +11,8 @@ const columns = [
   },
   {
     title: "User Agent",
-    dataIndex: "user_agent",
-    key: "user_agent",
+    dataIndex: "userAgent",
+    key: "userAgent",
   },
   {
     title: "Thời gian",
@@ -32,13 +32,16 @@ function LoginHistory() {
   useEffect(() => {
     const fetchData = async () => {
       const result = await getLoginHistory();
+      console.log("res", result);
       if (result.EC === 0) {
         setLoginHistories(result.result);
       }
     };
     fetchData();
   }, []);
+  
   const navigate = useNavigate();
+  
   return (
     <div className="lg:ml-[300px] mt-[64px] px-2 py-4 lg:p-6 min-h-screen bg-gray-50">
       <div className="bg-white p-4 shadow-lg">
@@ -46,10 +49,10 @@ function LoginHistory() {
           columns={columns}
           dataSource={loginHistories}
           pagination={{ pageSize: 5 }}
-          rowKey="_id"
+          rowKey="id"
           scroll={{ x: "max-content" }}
           onRow={(record) => ({
-            onClick: () => navigate(`/admin/history/${record._id}`),
+            onClick: () => navigate(`/admin/history/${record.id}`),
           })}
           className="cursor-pointer"
         />

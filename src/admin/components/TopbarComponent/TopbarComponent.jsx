@@ -14,15 +14,19 @@ function TopbarComponent({ admin_name, toggleSidebar }) {
     "/admin/employees": "Danh sách nhân viên",
     "/admin/discounts": "Danh sách mã giảm giá",
     "/admin/my-store": "Thông tin cửa hàng",
+    "/admin/history": "Lịch sử đăng nhập",
+    "/admin/history/:id": "Chi tiết lịch sử",
   };
 
   let currentPage = "Admin Panel";
   if (location.pathname.startsWith("/admin/order-details/")) {
     currentPage = "Chi tiết đơn hàng";
+  } else if (location.pathname.startsWith("/admin/history/")) {
+    currentPage = "Chi tiết lịch sử";
   } else if (pageTitles[location.pathname]) {
     currentPage = pageTitles[location.pathname];
   }
-
+  
   return (
     <div className="fixed top-0 left-0 lg:left-[300px] z-10 bg-white right-0 h-16 flex items-center justify-between px-2 lg:px-6 shadow-md transition-all duration-300">
       <div className="flex items-center gap-3">

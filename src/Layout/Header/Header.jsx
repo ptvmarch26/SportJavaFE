@@ -100,6 +100,7 @@ const Header = () => {
       const token = localStorage.getItem("accessToken");
 
       const res = await getChatBotSearch(query);
+      console.log("ress", res);
 
       if (res.EC === 0) {
         const result = res.result;

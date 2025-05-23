@@ -10,9 +10,11 @@ function AddressFormComponent({
   setNewAddress,
   formErrors,
   setFormErrors,
+  showEmail,
 }) {
   const fieldNames = {
     name: "Họ và tên",
+    email: "Email",
     phone: "Số điện thoại",
     homeAddress: "Địa chỉ",
     province: "Tỉnh/Thành phố",
@@ -37,6 +39,16 @@ function AddressFormComponent({
         ...prev,
         [field]: `Bạn chưa nhập ${fieldNames[field]}`,
       }));
+    } else if (field === "email") {
+      const emailRegex = /\S+@\S+\.\S+/;
+      if (!emailRegex.test(newAddress.email)) {
+        setFormErrors((prev) => ({
+          ...prev,
+          email: "Email không hợp lệ",
+        }));
+      } else {
+        setFormErrors((prev) => ({ ...prev, email: "" }));
+      }
     } else {
       setFormErrors((prev) => ({ ...prev, [field]: "" }));
     }
@@ -121,6 +133,32 @@ function AddressFormComponent({
           </div>
         </div>
       </div>
+      {showEmail && (
+        <div className="relative w-full mb-3">
+          <input
+            id="email"
+            type="email"
+            value={newAddress.email}
+            onChange={(e) =>
+              setNewAddress({ ...newAddress, email: e.target.value })
+            }
+            onBlur={() => handleBlur("email")}
+            className={`peer w-full p-2 border rounded focus:ring-black placeholder-transparent ${
+              formErrors.email ? "border-red-500" : "border-gray-300"
+            }`}
+            placeholder="Email"
+          />
+          <label
+            htmlFor="email"
+            className="absolute !text-sm bg-white px-1 left-2.5 top-2.5 text-black transition-all transform origin-left peer-placeholder-shown:text-base peer-placeholder-shown:text-black peer-focus:-top-2.5 peer-focus:left-2.5 peer-[&:not(:placeholder-shown)]:-top-2.5 peer-[&:not(:placeholder-shown)]:left-2.5 peer-focus:text-xs peer-focus:text-black peer-focus:scale-90 cursor-text peer-not-placeholder-shown:opacity-0"
+          >
+            Email
+          </label>
+          {formErrors.email && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+          )}
+        </div>
+      )}
 
       {/* Phone Number */}
       <div className="relative w-full mb-3">

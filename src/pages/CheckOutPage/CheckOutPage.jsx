@@ -40,6 +40,7 @@ function CheckoutPage() {
 
   const [newAddress, setNewAddress] = useState({
     name: "",
+    email: "",
     phone: "",
     homeAddress: "",
     province: "",
@@ -49,6 +50,7 @@ function CheckoutPage() {
   });
   const [formErrors, setFormErrors] = useState({
     name: "",
+    email: "",
     phone: "",
     homeAddress: "",
     province: "",
@@ -268,6 +270,7 @@ function CheckoutPage() {
       ].filter(Boolean)
     );
   };
+  console.log("se", selectedUser);
 
   const closeOverlay = () => setIsOverlayOpen(false);
 
@@ -295,9 +298,22 @@ function CheckoutPage() {
       errors.ward = "Bạn chưa nhập Phường/Xã";
       isValid = false;
     }
+    if (!selectedUser) {
+      if (!newAddress.email) {
+        errors.email = "Bạn chưa nhập Email";
+        isValid = false;
+      }
+    }
     if (!newAddress.phone) {
       errors.phone = "Bạn chưa nhập Số điện thoại";
       isValid = false;
+    }
+    if (newAddress.email) {
+      const emailRegex = /\S+@\S+\.\S+/;
+      if (!emailRegex.test(newAddress.email)) {
+        errors.email = "Email không hợp lệ";
+        isValid = false;
+      }
     }
 
     setFormErrors(errors);
@@ -386,6 +402,7 @@ function CheckoutPage() {
                 setNewAddress={setNewAddress}
                 formErrors={formErrors}
                 setFormErrors={setFormErrors}
+                showEmail={!selectedUser}
               />
             )}
             {selectedAddress && (

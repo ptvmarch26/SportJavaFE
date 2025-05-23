@@ -4,6 +4,10 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "../../context/PopupContext";
+import {
+  createLoginHistory,
+  getClientIP,
+} from "../../services/api/LoginHistoryApi";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -38,6 +42,18 @@ const LoginPage = () => {
     // còn lỗi vặt ở hiển thị lỗi nào
     const response = await handleLogin(username, password);
     if (response?.EC === 0 && response?.result?.user.role === "ADMIN") {
+      const ip = await getClientIP();
+      const loginHistoryRes = await createLoginHistory({
+        userId: response.result.user.id,
+        ip,
+        role: response.result.user.role,
+        userAgent: navigator.userAgent,
+      });
+
+      if (loginHistoryRes.EC === 0) {
+        localStorage.setItem("loginHistoryId", loginHistoryRes.result.id);
+      }
+
       showPopup(`${response.EM}, Chào mừng bạn đến với trang quản trị`);
       navigate("/admin/dashboard");
     } else {

@@ -10,6 +10,7 @@ import {
 import logo from "../../../assets/images/logo.png";
 import { useAuth } from "../../../context/AuthContext";
 import { IoStorefrontOutline } from "react-icons/io5";
+import { GoHistory } from "react-icons/go";
 
 function SidebarComponent({ isOpen, toggleSidebar }) {
   const location = useLocation();
@@ -47,7 +48,12 @@ function SidebarComponent({ isOpen, toggleSidebar }) {
       name: "Cửa hàng của tôi",
       path: "/admin/my-store",
       icon: <IoStorefrontOutline size={20} />,
-    }
+    },
+    {
+      name: "Lịch sử đăng nhập",
+      path: "/admin/history",
+      icon: <GoHistory size={20} />,
+    },
   ];
 
   const handleLogoClick = () => {
