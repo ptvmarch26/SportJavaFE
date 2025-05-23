@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useOrder } from "../../context/OrderContext";
 import moment from "moment";
 import { usePopup } from "../../context/PopupContext";
+import { updateLoginHistory } from "../../services/api/LoginHistoryApi";
 
 const { Option } = Select;
 
@@ -36,7 +37,11 @@ const Orders = () => {
   }, [orders]);
 
   const handleStatusChange = async (orderId, newStatus) => {
+    const prevStatus = ordersState.find(
+      (order) => order.id === orderId
+    )?.orderStatus;
     const result = await handleUpdateOrderStatus(orderId, newStatus);
+    console.log("re", result);
     if (result.EC === 0) {
       const updatedOrders = ordersState.map((order) => {
         if (order.id === orderId) {
@@ -46,7 +51,18 @@ const Orders = () => {
       });
       setOrdersState(updatedOrders);
       showPopup(result.EM);
-    } else showPopup(result.EM, false);
+
+      const loginHistoryId = localStorage.getItem("loginHistoryId");
+      if (!loginHistoryId) {
+        return;
+      }
+      await updateLoginHistory(loginHistoryId, {
+        action: "CAP_NHAT_TRANG_THAI_DON_HANG",
+        orderId,
+        prevStatus,
+        newStatus,
+      });
+    } else showPopup(result.EM, false, 4000);
   };
 
   const filteredOrders = ordersState.filter((order) => {
