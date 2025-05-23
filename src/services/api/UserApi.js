@@ -110,7 +110,7 @@ export const deleteChatHistory = async () => {
 
 export const getChatBotSearch = async (query) => {
   try {
-      const response = await AxiosInstance.get("/chat", {
+      const response = await AxiosInstance.get("/openai/", {
           params: { message: query },
       });
 

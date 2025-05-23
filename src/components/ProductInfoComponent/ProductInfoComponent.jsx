@@ -131,7 +131,7 @@ const ProductInfoComponent = ({ product }) => {
       if (token) {
         const favouritesData = await getFavourite();
         if (favouritesData && favouritesData.result) {
-          setIsFavorite(favouritesData.result.includes(product.id));
+          setIsFavorite(favouritesData.result.includes(product?.id));
         }
       }
     };

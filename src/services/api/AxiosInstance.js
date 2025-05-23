@@ -23,18 +23,20 @@ AxiosInstance.interceptors.request.use(
 AxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 500) {
       try {
         // Gọi refreshToken để lấy lại accessToken mới
         const res = await refreshToken();
+        console.log(res);
         if (res.EC === 0) {
-            // Cập nhật lại accessToken trong localStorage
+            // Cập nhật lại accessToken và refreshToken trong localStorage
             localStorage.setItem("accessToken", res.result.accessToken);
+            localStorage.setItem("refreshToken", res.result.refreshToken);
           // Cập nhật lại token mới trong headers và retry request
-          error.config.headers["Authorization"] = `Bearer ${res.accessToken}`;
+          error.config.headers["Authorization"] = `Bearer ${res.result.accessToken}`;
           return AxiosInstance(error.config);  // Thực hiện lại request với token mới
         }
-      } catch {
+      } catch (error){
         return;
       }
     }

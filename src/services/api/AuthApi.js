@@ -63,18 +63,6 @@ export const resetPassword = async (email, newPassword) => {
   }
 };
 
-export const changePassword = async (oldPassword, newPassword) => {
-  try {
-    const res = await AxiosInstance.patch("/auth/change_password", {
-      oldPassword,
-      newPassword,
-    });
-    return res.data;
-  } catch (error) {
-    return error.response?.data || "Lỗi kết nối đến server";
-  }
-};
-
 export const signUpWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, provider);
@@ -111,7 +99,7 @@ export const refreshToken = async () => {
   }
 
   try {
-    const res = await AxiosInstance.post("/auth/refresh_token", {
+    const res = await AxiosInstance.post("/auth/refresh-token", {
       refreshToken,
     });
     return res.data;

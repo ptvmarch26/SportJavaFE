@@ -109,7 +109,7 @@ const CompactChatBot = ({ onClose }) => {
 
     try {
       const res = await axios.post(
-        `${URL}/chat`,
+        `${URL}/openai/`,
         {
           message: input,
           history: !token
