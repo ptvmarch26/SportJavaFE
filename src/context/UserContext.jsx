@@ -11,6 +11,7 @@ import {
   deleteSearch,
   getChatHistory,
   deleteChatHistory,
+  updateUserProfile,
 } from "../services/api/UserApi";
 import { message } from "antd";
 import { useAuth } from "./AuthContext";
@@ -22,20 +23,17 @@ export const UserProvider = ({ children }) => {
   const [discounts, setDiscounts] = useState([]);
   const { token } = useAuth();
   const fetchUsers = async () => {
-      const data = await getAllUsers();
-      if (
-        data?.EC === 0 &&
-        Array.isArray(data.result)
-      ) {
-        const processedUsers = data.result.map((user) => ({
-          ...user,
-          status: user.deletedAt ? "Đã khóa" : "Hoạt động",
-        }));
+    const data = await getAllUsers();
+    if (data?.EC === 0 && Array.isArray(data.result)) {
+      const processedUsers = data.result.map((user) => ({
+        ...user,
+        status: user.deletedAt ? "Đã khóa" : "Hoạt động",
+      }));
 
-        return processedUsers;
-      } else {
-        message.error("Không thể tải danh sách người dùng!");
-      }
+      return processedUsers;
+    } else {
+      message.error("Không thể tải danh sách người dùng!");
+    }
   };
 
   const fetchUser = async () => {
@@ -56,9 +54,20 @@ export const UserProvider = ({ children }) => {
 
   const handleUpdateUser = async (userData) => {
     const updatedUser = await updateUser(userData);
+    console.log("re", updatedUser);
     setSelectedUser((prev) => ({
       ...prev,
-      ...updatedUser.data,
+      ...updatedUser.result,
+    }));
+    return updatedUser;
+  };
+
+  const handleUpdateUserProfile = async (userData) => {
+    const updatedUser = await updateUserProfile(userData);
+    console.log("profile", updatedUser);
+    setSelectedUser((prev) => ({
+      ...prev,
+      ...updatedUser.result,
     }));
     return updatedUser;
   };
@@ -110,6 +119,7 @@ export const UserProvider = ({ children }) => {
         fetchUsers,
         fetchUser,
         handleUpdateUser,
+        handleUpdateUserProfile,
         handleChangePassword,
         handleAddAddress,
         handleUpdateAddress,

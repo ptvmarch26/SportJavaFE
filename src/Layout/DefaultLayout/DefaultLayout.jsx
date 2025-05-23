@@ -11,6 +11,7 @@ import { FaBalanceScale } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { useProduct } from "../../context/ProductContext";
 import { IoIosStar } from "react-icons/io";
+import { compareProductsAI } from "../../services/api/UserApi";
 
 const DefaultLayout = ({ children }) => {
   const location = useLocation();
@@ -18,6 +19,7 @@ const DefaultLayout = ({ children }) => {
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [compareCount, setCompareCount] = useState(0);
   const [compareProducts, setCompareProducts] = useState([]);
+  const [comparisonText, setComparisonText] = useState("");
   const [loading, setLoading] = useState(false);
   const { fetchProductDetails } = useProduct();
 
@@ -118,6 +120,29 @@ const DefaultLayout = ({ children }) => {
 
     return images;
   };
+
+  useEffect(() => {
+    const fetchComparison = async () => {
+      if (isCompareOpen) {
+        setLoading(true);
+        try {
+          const res = await compareProductsAI(
+            compareProducts[0].id,
+            compareProducts[1].id
+          );
+          console.log("rs", res);
+          if (res?.EC === 0) setComparisonText(res.result);
+          else setComparisonText("Không thể so sánh sản phẩm lúc này.");
+        } catch {
+          setComparisonText("Lỗi khi so sánh sản phẩm.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchComparison();
+  }, [compareProducts]);
 
   return (
     <div>
@@ -240,6 +265,7 @@ const DefaultLayout = ({ children }) => {
                             {product.productDescription}
                           </p>
                         </div>
+                        <p>{comparisonText}</p>
                       </div>
                     </div>
                   ))}

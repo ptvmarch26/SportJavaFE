@@ -32,7 +32,18 @@ export const changePassword = async (oldPassword, newPassword) => {
 
 export const updateUser = async (userData) => {
   try {
-    const response = await AxiosInstance.put("/user", userData);
+    const response = await AxiosInstance.put("/user/update", userData);
+    console.log("dt", userData)
+    return response.data;
+  } catch (error) {
+    return error.response?.data || "Lỗi kết nối đến server";
+  }
+};
+
+export const updateUserProfile = async (userData) => {
+  try {
+    const response = await AxiosInstance.put("/user/update/profile", userData);
+    console.log("dt", userData)
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";
@@ -113,6 +124,17 @@ export const getChatBotSearch = async (query) => {
           params: { message: query },
       });
 
+    return response.data;
+  } catch (error) {
+    return error.response?.data || null;
+  }
+};
+
+export const compareProductsAI = async (productIdA, productIdB) => {
+  try {
+    const response = await AxiosInstance.get("/openai/compare", {
+      params: { productIdA, productIdB }
+    });
     return response.data;
   } catch (error) {
     return error.response?.data || null;

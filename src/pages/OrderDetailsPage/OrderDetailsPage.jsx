@@ -1,14 +1,13 @@
-import { useLocation, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useOrder } from "../../context/OrderContext";
 import { useEffect } from "react";
 import { usePopup } from "../../context/PopupContext";
 
 const OrderDetailsPage = () => {
   const { id } = useParams();
-  const { fetchOrderDetail, orderDetails } = useOrder();
+  const { fetchOrderDetail, orderDetails, setOrderDetails } = useOrder();
   const { showPopup } = usePopup();
-  const location = useLocation();
-  const email = location.state?.email;
+  const navigate = useNavigate();
 
   const ORDER_STATUS_LABELS = {
     CHO_XAC_NHAN: "Chờ xác nhận",
@@ -21,25 +20,51 @@ const OrderDetailsPage = () => {
   };
 
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const code = query.get("code");
-    const status = query.get("status");
-    const cancel = query.get("cancel") === "true";
-    if (code === "00" && status === "PAID" && !cancel) {
-      showPopup(
-        "Thanh toán đơn hàng thành công, cảm ơn quý khách đã sử dụng dịch vụ tại WTM Sport",
-        true,
-        5000
-      );
-    } else if (code === "00" && status === "SUCCESS" && !cancel) {
-      showPopup(
-        "Đặt hàng thành công, cảm ơn quý khách đã sử dụng dịch vụ tại WTM Sport"
-      ),
-        true,
-        5000;
-    }
+    const fetchData = async () => {
+      const res = await fetchOrderDetail(id);
 
-    fetchOrderDetail(id);
+      if (res.EC === 2) {
+        showPopup("Bạn không có quyền truy cập đơn hàng này", false, 2000);
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+        return;
+      }
+
+      // Đã có quyền và dữ liệu hợp lệ, kiểm tra query param để show popup thành công
+      const query = new URLSearchParams(window.location.search);
+      const code = query.get("code");
+      const status = query.get("status");
+      const cancel = query.get("cancel") === "true";
+
+      if (code === "00" && status === "PAID" && !cancel) {
+        showPopup(
+          "Thanh toán đơn hàng thành công, cảm ơn quý khách đã sử dụng dịch vụ tại WTM Sport",
+          true,
+          5000
+        );
+      } else if (code === "00" && status === "SUCCESS" && !cancel) {
+        showPopup(
+          "Đặt hàng thành công, cảm ơn quý khách đã sử dụng dịch vụ tại WTM Sport",
+          true,
+          5000
+        );
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  useEffect(() => {
+    setOrderDetails(null);
+    const fetchData = async () => {
+      const res = await fetchOrderDetail(id);
+      if (res.EC === 2) {
+        showPopup("Bạn không có quyền truy cập đơn hàng này", false, 2000);
+        return;
+      }
+    };
+    fetchData();
   }, [id]);
 
   // Hàm tìm giá variant và hình ảnh dựa vào màu sắc và kích thước
@@ -68,7 +93,6 @@ const OrderDetailsPage = () => {
   };
 
   console.log("aa", orderDetails);
-  console.log("emem", email);
 
   return (
     <div className="xl:max-w-[1200px] container mx-auto py-10 px-2">
@@ -96,7 +120,7 @@ const OrderDetailsPage = () => {
           <strong className="text-sm inline-block font-semibold min-w-[100px]">
             Email:{" "}
           </strong>
-          {email} {" "}
+          {orderDetails?.email}{" "}
           <span className="text-sm text-gray-500">
             (Vui lòng kiểm tra email của bạn để biết thêm chi tiết về đơn hàng)
           </span>
