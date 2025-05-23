@@ -10,6 +10,7 @@ function LoginHistoryDetail() {
   useEffect(() => {
     const fetchData = async () => {
       const result = await getLoginHistoryById(id);
+      console.log("rs", result);
       if (result.EC === 0) {
         setLoginHistory(result.result);
       }
@@ -20,8 +21,8 @@ function LoginHistoryDetail() {
   const columns = [
     {
       title: "Mã đơn hàng",
-      dataIndex: "order_id",
-      key: "order_id",
+      dataIndex: "orderId",
+      key: "orderId",
       render: (text) => (
         <a
           onClick={() => navigate(`/admin/order-details/${text}`)}
@@ -33,13 +34,13 @@ function LoginHistoryDetail() {
     },
     {
       title: "Trạng thái trước",
-      dataIndex: "prev_status",
-      key: "prev_status",
+      dataIndex: "prevStatus",
+      key: "prevStatus",
     },
     {
       title: "Trạng thái mới",
-      dataIndex: "new_status",
-      key: "new_status",
+      dataIndex: "newStatus",
+      key: "newStatus",
     },
     {
       title: "Thời gian",
@@ -58,7 +59,7 @@ function LoginHistoryDetail() {
             <strong>IP:</strong> {loginHistory?.ip}
           </p>
           <p>
-            <strong>User Agent:</strong> {loginHistory?.user_agent}
+            <strong>User Agent:</strong> {loginHistory?.userAgent}
           </p>
         </div>
         <div className="space-y-3 px-3 py-5 border rounded">
