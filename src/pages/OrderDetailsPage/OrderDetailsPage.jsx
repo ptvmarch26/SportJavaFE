@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useOrder } from "../../context/OrderContext";
 import { useEffect } from "react";
 import { usePopup } from "../../context/PopupContext";
@@ -7,6 +7,8 @@ const OrderDetailsPage = () => {
   const { id } = useParams();
   const { fetchOrderDetail, orderDetails } = useOrder();
   const { showPopup } = usePopup();
+  const location = useLocation();
+  const email = location.state?.email;
 
   const ORDER_STATUS_LABELS = {
     CHO_XAC_NHAN: "Chờ xác nhận",
@@ -65,11 +67,16 @@ const OrderDetailsPage = () => {
     return { variantPrice, productImage };
   };
 
+  console.log("aa", orderDetails);
+  console.log("emem", email);
+
   return (
     <div className="xl:max-w-[1200px] container mx-auto py-10 px-2">
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold uppercase mb-4">Chi tiết đơn hàng</h1>
-        <p className="text-sm font-semibold">{ORDER_STATUS_LABELS[orderDetails?.orderStatus]}</p>
+        <p className="text-sm font-semibold">
+          {ORDER_STATUS_LABELS[orderDetails?.orderStatus]}
+        </p>
       </div>
       <div className="bg-[#f6f6f6] rounded-lg mb-4 p-5 space-y-2">
         <h3 className="text-lg uppercase font-semibold">Thông tin nhận hàng</h3>
@@ -84,6 +91,15 @@ const OrderDetailsPage = () => {
             Số điện thoại:{" "}
           </strong>
           {orderDetails?.shippingAddress?.phone}
+        </p>{" "}
+        <p>
+          <strong className="text-sm inline-block font-semibold min-w-[100px]">
+            Email:{" "}
+          </strong>
+          {email} {" "}
+          <span className="text-sm text-gray-500">
+            (Vui lòng kiểm tra email của bạn để biết thêm chi tiết về đơn hàng)
+          </span>
         </p>{" "}
         <p>
           <strong className="text-sm inline-block font-semibold min-w-[100px]">

@@ -184,7 +184,7 @@ const Orders = () => {
           }}
           dataSource={filteredOrders}
           columns={columns}
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
           rowKey="id"
           onRow={(record) => ({
             onClick: () => navigate(`/admin/order-details/${record.id}`),

@@ -113,7 +113,7 @@ const Customers = () => {
         <Table
           dataSource={filteredUsers}
           columns={columns}
-          pagination={{ pageSize: 8 }}
+          pagination={{ pageSize: 10 }}
           rowKey="id"
           className="rounded-none"
           scroll={{ x: "max-content" }}
