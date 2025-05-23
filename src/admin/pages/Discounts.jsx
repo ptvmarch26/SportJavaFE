@@ -271,7 +271,7 @@ const Discounts = () => {
           }}
           dataSource={filteredDiscounts}
           columns={columns}
-          pagination={{ pageSize: 8 }}
+          pagination={{ pageSize: 10 }}
           rowKey="id"
           scroll={{ x: "max-content" }}
         />

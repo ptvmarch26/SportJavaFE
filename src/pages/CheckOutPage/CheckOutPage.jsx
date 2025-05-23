@@ -372,7 +372,12 @@ function CheckoutPage() {
     if (res?.EC === 0) {
       setCart([]);
       navigate(
-        `/orders/order-details/${res.result.id}?code=00&status=SUCCESS&cancel=false`
+        `/orders/order-details/${res.result.id}?code=00&status=SUCCESS&cancel=false`,
+        {
+          state: {
+            email: selectedUser?.email || newAddress.email,
+          },
+        }
       );
       return;
     }
