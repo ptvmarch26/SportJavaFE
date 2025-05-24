@@ -123,26 +123,23 @@ const DefaultLayout = ({ children }) => {
 
   useEffect(() => {
     const fetchComparison = async () => {
-      if (isCompareOpen) {
-        setLoading(true);
+      if (isCompareOpen && compareProducts.length === 2) {
         try {
+          setComparisonText("");
           const res = await compareProductsAI(
             compareProducts[0].id,
             compareProducts[1].id
           );
-          console.log("rs", res);
           if (res?.EC === 0) setComparisonText(res.result);
           else setComparisonText("Không thể so sánh sản phẩm lúc này.");
         } catch {
           setComparisonText("Lỗi khi so sánh sản phẩm.");
-        } finally {
-          setLoading(false);
         }
       }
     };
 
     fetchComparison();
-  }, [compareProducts]);
+  }, [compareProducts, isCompareOpen]);
 
   return (
     <div>
@@ -265,10 +262,23 @@ const DefaultLayout = ({ children }) => {
                             {product.productDescription}
                           </p>
                         </div>
-                        <p>{comparisonText}</p>
                       </div>
                     </div>
                   ))}
+                </div>
+                <div className="flex mt-4 text-justify justify-center min-h-[100px]">
+                  {compareProducts.length < 2 ? (
+                    <p className="text-gray-500 italic">
+                      Chọn thêm sản phẩm để hiển thị so sánh
+                    </p>
+                  ) : comparisonText ? (
+                    <div dangerouslySetInnerHTML={{ __html: comparisonText }} />
+                  ) : (
+                    <div className="flex items-center gap-3 text-gray-600">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-800"></div>
+                      <span>Đang so sánh sản phẩm...</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
