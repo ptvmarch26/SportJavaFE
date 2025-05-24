@@ -29,9 +29,9 @@ const ProductPage = () => {
     setSelectedFilters((prev) => {
       const newFilters = {
         ...prev,
-        category: category ? [category] : prev.category,
-        category_gender: category_gender || prev.category_gender,
-        category_sub: category_sub || prev.category_sub,
+        category: [category],
+        category_gender: category_gender,
+        category_sub: category_sub,
       };
       return newFilters;
     });
