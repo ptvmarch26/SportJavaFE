@@ -17,13 +17,13 @@ const ProductPage = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const hasQuery = Array.from(queryParams.keys()).length > 0;
+    const category = queryParams.get("category") || "";
+    const category_gender = queryParams.get("category_gender") || "";
+    const category_sub = queryParams.get("category_sub") || "";
+
+    const hasQuery = category || category_gender || category_sub;
 
     if (hasQuery) {
-      const category = queryParams.get("category") || "";
-      const category_gender = queryParams.get("category_gender") || "";
-      const category_sub = queryParams.get("category_sub") || "";
-
       const filters = {
         category: category ? [category] : undefined,
         category_gender: category_gender || undefined,
@@ -34,15 +34,6 @@ const ProductPage = () => {
       fetchProducts(filters);
     }
   }, [location.search]);
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const hasQuery = Array.from(queryParams.keys()).length > 0;
-
-    if (!hasQuery && Object.keys(selectedFilters).length > 0) {
-      fetchProducts(selectedFilters);
-    }
-  }, [selectedFilters]);
 
   const { token } = useAuth();
   const [favourites, setFavourites] = useState([]);
