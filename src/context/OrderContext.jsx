@@ -23,14 +23,12 @@ export const OrderProvider = ({ children }) => {
 
   const fetchOrdersByUser = async (userId, orderStatus = "all") => {
     const res = await getOrderByUser(userId, orderStatus);
-    console.log("res", res);
     setOrders(res?.result);
     return res;
   };
 
   const fetchOrderDetail = async (orderId) => {
     const res = await getOrderDetail(orderId);
-    console.log("res", res);
     if (res?.EC === 0) {
       setOrderDetails(res.result);
     } else {
@@ -41,7 +39,6 @@ export const OrderProvider = ({ children }) => {
 
   const handleCreateOrder = async (orderData) => {
     const res = await createOrder(orderData);
-    console.log(res);
     return res;
   };
 

@@ -32,7 +32,6 @@ function LoginHistory() {
   useEffect(() => {
     const fetchData = async () => {
       const result = await getLoginHistory();
-      console.log("res", result);
       if (result.EC === 0) {
         setLoginHistories(result.result);
       }

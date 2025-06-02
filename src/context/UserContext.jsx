@@ -54,7 +54,6 @@ export const UserProvider = ({ children }) => {
 
   const handleUpdateUser = async (userData) => {
     const updatedUser = await updateUser(userData);
-    console.log("re", updatedUser);
     setSelectedUser((prev) => ({
       ...prev,
       ...updatedUser.result,
@@ -64,7 +63,6 @@ export const UserProvider = ({ children }) => {
 
   const handleUpdateUserProfile = async (userData) => {
     const updatedUser = await updateUserProfile(userData);
-    console.log("profile", updatedUser);
     setSelectedUser((prev) => ({
       ...prev,
       ...updatedUser.result,
