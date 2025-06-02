@@ -92,8 +92,6 @@ const OrderDetailsPage = () => {
     return { variantPrice, productImage };
   };
 
-  console.log("aa", orderDetails);
-
   return (
     <div className="xl:max-w-[1200px] container mx-auto py-10 px-2">
       <div className="flex justify-between">

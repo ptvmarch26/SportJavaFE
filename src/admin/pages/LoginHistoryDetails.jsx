@@ -10,7 +10,6 @@ function LoginHistoryDetail() {
   useEffect(() => {
     const fetchData = async () => {
       const result = await getLoginHistoryById(id);
-      console.log("rs", result);
       if (result.EC === 0) {
         setLoginHistory(result.result);
       }

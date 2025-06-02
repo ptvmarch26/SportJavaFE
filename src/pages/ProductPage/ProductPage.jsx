@@ -15,33 +15,33 @@ const ProductPage = () => {
   const [selectedFilters, setSelectedFilters] = useState({});
   const queryParams = new URLSearchParams(location.search);
 
-  const category = queryParams.get("category") || "";
-  const category_gender = queryParams.get("category_gender") || "";
-  const category_sub = queryParams.get("category_sub") || "";
-
   useEffect(() => {
-    // const searchParams = {
-    //   category,
-    //   category_gender,
-    //   category_sub,
-    // };
+    const queryParams = new URLSearchParams(location.search);
+    const hasQuery = Array.from(queryParams.keys()).length > 0;
 
-    setSelectedFilters((prev) => {
-      const newFilters = {
-        ...prev,
-        category: [category],
-        category_gender: category_gender,
-        category_sub: category_sub,
+    if (hasQuery) {
+      const category = queryParams.get("category") || "";
+      const category_gender = queryParams.get("category_gender") || "";
+      const category_sub = queryParams.get("category_sub") || "";
+
+      const filters = {
+        category: category ? [category] : undefined,
+        category_gender: category_gender || undefined,
+        category_sub: category_sub || undefined,
       };
-      return newFilters;
-    });
-  }, [category, category_gender, category_sub]);
+
+      setSelectedFilters(filters);
+      fetchProducts(filters);
+    }
+  }, [location.search]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchProducts(selectedFilters);
-    };
-    fetchData();
+    const queryParams = new URLSearchParams(location.search);
+    const hasQuery = Array.from(queryParams.keys()).length > 0;
+
+    if (!hasQuery && Object.keys(selectedFilters).length > 0) {
+      fetchProducts(selectedFilters);
+    }
   }, [selectedFilters]);
 
   const { token } = useAuth();
@@ -241,6 +241,7 @@ const ProductPage = () => {
         }}
         onFilterChange={(filters) => {
           setSelectedFilters(filters);
+          fetchProducts(filters);
           navigate("/product");
         }}
       />

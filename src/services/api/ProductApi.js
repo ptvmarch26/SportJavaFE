@@ -169,15 +169,23 @@ export const getAllProducts = async (filters) => {
     filters = JSON.parse(filters);
   }
 
+  const clean = (value) =>
+    value === undefined ||
+    value === null ||
+    (Array.isArray(value) && value.length === 0) ||
+    (Array.isArray(value) && value[0] === "") ||
+    value === "";
+
   const params = {
-    categoryGender: filters.category_gender,
-    category: filters.category,
-    categorySub: filters.category_sub,
-    productColor: filters.product_color,
-    productBrand: filters.product_brand,
-    priceMin: filters.price_min,
-    priceMax: filters.price_max,
+    categoryGender: clean(filters.category_gender) ? undefined : filters.category_gender,
+    category: clean(filters.category) ? undefined : filters.category,
+    categorySub: clean(filters.category_sub) ? undefined : filters.category_sub,
+    productColor: clean(filters.product_color) ? undefined : filters.product_color,
+    productBrand: clean(filters.product_brand) ? undefined : filters.product_brand,
+    priceMin: clean(filters.price_min) ? undefined : filters.price_min,
+    priceMax: clean(filters.price_max) ? undefined : filters.price_max,
   };
+
   console.log("params", params);
 
   try {
