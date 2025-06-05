@@ -177,21 +177,34 @@ export const getAllProducts = async (filters) => {
     value === "";
 
   const params = {
-    categoryGender: clean(filters.category_gender) ? undefined : filters.category_gender,
+    categoryGender: clean(filters.category_gender)
+      ? undefined
+      : filters.category_gender,
     category: clean(filters.category) ? undefined : filters.category,
     categorySub: clean(filters.category_sub) ? undefined : filters.category_sub,
-    productColor: clean(filters.product_color) ? undefined : filters.product_color,
-    productBrand: clean(filters.product_brand) ? undefined : filters.product_brand,
+    productColor: clean(filters.product_color)
+      ? undefined
+      : filters.product_color,
+    productBrand: clean(filters.product_brand)
+      ? undefined
+      : filters.product_brand,
     priceMin: clean(filters.price_min) ? undefined : filters.price_min,
     priceMax: clean(filters.price_max) ? undefined : filters.price_max,
   };
-
-  console.log("params", params);
 
   try {
     const response = await AxiosInstance.get("/product/get-all", { params });
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";
+  }
+};
+
+export const getRecommendedProducts = async (userId) => {
+  try {
+    const response = await AxiosInstance.get(`/product/recommend/${userId}`);
+    return response.data;
+  } catch {
+    return [];
   }
 };
