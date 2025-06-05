@@ -114,9 +114,9 @@ const CompactChatBot = ({ onClose }) => {
           message: input,
           history: !token
             ? newMessages.map((msg) => ({
-                role: msg.sender === "bot" ? "assistant" : "user",
-                content: msg.text,
-              }))
+              role: msg.sender === "bot" ? "assistant" : "user",
+              content: msg.text,
+            }))
             : undefined,
         },
         {
@@ -127,12 +127,20 @@ const CompactChatBot = ({ onClose }) => {
         }
       );
 
-      const botMessage = {
-        text: res.data.result || "Xin lỗi, có lỗi xảy ra!",
-        sender: "bot",
-      };
 
-      setMessages((prev) => [...prev, botMessage]);
+      // Lấy message và products từ response mới
+      const { message, products } = res.data.result || {};
+
+      // Thêm message của bot vào danh sách chat
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: message || "Xin lỗi, có lỗi xảy ra!",
+          sender: "bot",
+          // Thêm products vào message nếu có
+          products: Array.isArray(products) ? products : [],
+        },
+      ]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -170,18 +178,47 @@ const CompactChatBot = ({ onClose }) => {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${
-              message.sender === "user" ? "justify-end" : "justify-start"
-            } mb-2`}
+            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"
+              } mb-2`}
           >
             <div
-              className={`p-2 rounded-lg max-w-xs ${
-                message.sender === "user"
+              className={`p-2 rounded-lg max-w-xs ${message.sender === "user"
                   ? "bg-[#171717] text-white text-right"
                   : "bg-gray-200 text-black"
-              }`}
+                }`}
             >
               <div className="text-sm">{message.text}</div>
+
+              {message.sender === "bot" &&
+                Array.isArray(message.products) &&
+                message.products.length > 0 && (
+                  <div className="mt-2 flex flex-col gap-2">
+                    {message.products.map((prod) => (
+                      <div
+                        key={prod.id}
+                        className="flex items-center gap-2 bg-white rounded border p-2 shadow-sm"
+                      >
+                        <img
+                          src={prod.productImg}
+                          alt={prod.productTitle}
+                          className="w-12 h-12 rounded object-cover border"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium truncate">{prod.productTitle}</div>
+                          <div className="text-xs text-gray-600">
+                            {prod.productPrice?.toLocaleString()}đ
+                          </div>
+                        </div>
+                        <button
+                          className="px-2 py-1 text-xs bg-primary text-white rounded hover:bg-black"
+                          onClick={() => window.location.href = `/product/${prod.id}`}
+                        >
+                          Xem
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
           </div>
         ))}
@@ -190,6 +227,7 @@ const CompactChatBot = ({ onClose }) => {
         )}
         <div ref={endOfMessagesRef} />
       </div>
+
 
       <div className="p-2 border-t">
         <div className="relative">

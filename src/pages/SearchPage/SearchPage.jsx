@@ -58,6 +58,7 @@ const SearchPage = () => {
     applySorting(sortOption, products);
   };
 
+
   const applySorting = (sortOption, productsToSort) => {
     let sortedProducts = [...productsToSort];
 
@@ -173,10 +174,10 @@ const SearchPage = () => {
         {sortProducts
           .slice((currentPage - 1) * 12, currentPage * 12)
           .map((product) => (
-            <AnimationScroll key={product._id} type="fadeUp" delay={0.1}>
+            <AnimationScroll key={product.id} type="fadeUp" delay={0.1}>
               <ProductComponent
                 item={product}
-                onClick={() => navigate(`/product/${product._id}`)}
+                onClick={() => navigate(`/product/${product.id}`)}
               />
             </AnimationScroll>
           ))}
