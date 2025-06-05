@@ -41,7 +41,6 @@ const Orders = () => {
       (order) => order.id === orderId
     )?.orderStatus;
     const result = await handleUpdateOrderStatus(orderId, newStatus);
-    console.log("re", result);
     if (result.EC === 0) {
       const updatedOrders = ordersState.map((order) => {
         if (order.id === orderId) {

@@ -1,16 +1,17 @@
-# [IE213.P21] - ĐỒ ÁN XÂY DỰNG WEBSITE BÁN ĐỒ THỂ THAO PHẦN FRONT_END DÀNH CHO USER VÀ ADMIN
+# [IE303.P22] - ĐỒ ÁN XÂY DỰNG WEBSITE BÁN ĐỒ THỂ THAO PHẦN FRONT_END DÀNH CHO USER VÀ ADMIN
 
 * Trường Đại học Công nghệ Thông tin, Đại học Quốc gia Thành phố Hồ Chí Minh (ĐHQG-HCM)
 * Khoa: Khoa học và Kỹ thuật Thông tin (KH&KTTT)
-* GVHD: ThS. Võ Tấn Khoa
+* GVHD: ThS. Nguyễn Thành Luân
 
 ## Danh sách thành viên
 |STT | Họ tên | MSSV|Chức vụ|
 |:---:|:-------------:|:-----:|:-----:|
-|1. 	| Châu Đức Mạnh | 22520846 | Nhóm trưởng |
+|1. 	| Dương Anh Vũ		|	22521688 | Nhóm trưởng |
 |2. 	| Võ Văn Phi Thông		| 22521435 | Thành viên |
-|3. 	| Dương Anh Vũ		|	22521688 | Thành viên |
 |4. 	| Phạm Quang Vũ | 22521696 | Thành viên |
+|3. 	| Bùi Văn Sáng		|	22521236 | Thành viên |
+|3. 	| Nguyễn Quang Thắng		|	22521378 | Thành viên |
 
 ## Giới thiệu
 Trong bối cảnh công nghệ số ngày càng phát triển, việc mua sắm trực tuyến đã và đang trở thành một xu hướng phổ biến nhờ sự tiện lợi và đa dạng sản phẩm mà nó mang lại. Đặc biệt, nhu cầu rèn luyện sức khỏe, nâng cao thể chất của con người ngày càng tăng cao, kéo theo sự phát triển mạnh mẽ của thị trường đồ thể thao. Người tiêu dùng không chỉ tìm kiếm những sản phẩm thể thao chất lượng, phù hợp với từng bộ môn mà còn quan tâm đến yếu tố thời trang, độ bền và sự tiện dụng trong từng sản phẩm.
@@ -70,8 +71,7 @@ Nhằm đáp ứng xu hướng này, nhóm quyết định thực hiện đề t
 | UC6.02 | Xem lịch sử đăng nhập, chỉnh sửa trạng thái đơn hàng | AC3 | 100% |
 
 ## Công nghệ sử dụng
-* [Node.js] - Xử lý API, Back-end
-* [Express] - Framework nằm trên chức năng máy chủ web của NodeJS
+* [Spring Boot] - Xử lý AP  
 * [React.js] - Front-end
 * [MongoDB Compass] - Cung cấp giao diện xem cơ sở dữ liệu MongoDB
 * [MongoDB] - Hệ quản trị cơ sở dữ liệu phi quan hệ sử dụng để lưu trữ dữ liệu cho trang web
@@ -79,10 +79,7 @@ Nhằm đáp ứng xu hướng này, nhóm quyết định thực hiện đề t
 * [Tailwid CSS] - Framework CSS giúp thiết kế giao diện nhanh chóng
 * [PayOS] - Giải pháp thanh toán trực tuyến, hỗ trợ xử lý giao dịch cho website thương mại điện tử
 * [ChatGPT 4.0] - Công cụ AI hỗ trợ cải thiện trải nghiệm người dùng qua xử lý ngôn ngữ tự nhiên
-* [Docker] - Đóng gói ứng dụng và môi trường triển khai dưới dạng container
-* [AWS] - Nền tảng điện toán đám mây dùng để triển khai và vận hành hệ thống
-* [Jenkins] - Công cụ CI/CD hỗ trợ tự động hóa build, test và deploy
   
 ## Tổng hợp link các github
 * [FE_USER VÀ FE_ADMIN](https://github.com/ptvmarch26/WebSport)
-* [BE](https://github.com/ChauManh/SportEcommerceServices)
+* [BE](https://github.com/ra1n49/java_s2tv_sportshop)

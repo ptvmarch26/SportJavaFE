@@ -33,7 +33,6 @@ export const changePassword = async (oldPassword, newPassword) => {
 export const updateUser = async (userData) => {
   try {
     const response = await AxiosInstance.put("/user/update", userData);
-    console.log("dt", userData)
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";
@@ -43,7 +42,6 @@ export const updateUser = async (userData) => {
 export const updateUserProfile = async (userData) => {
   try {
     const response = await AxiosInstance.put("/user/update/profile", userData);
-    console.log("dt", userData)
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";
