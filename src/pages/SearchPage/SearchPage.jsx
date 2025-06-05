@@ -54,8 +54,6 @@ const SearchPage = () => {
     setCurrentSort(sortOption);
     setSortText(sortOption);
     setSortOpen(false);
-
-    applySorting(sortOption, products);
   };
 
   const applySorting = (sortOption, productsToSort) => {
@@ -63,10 +61,10 @@ const SearchPage = () => {
 
     switch (sortOption) {
       case "Giá: Cao đến Thấp":
-        sortedProducts.sort((a, b) => b.product_price - a.product_price);
+        sortedProducts.sort((a, b) => b.productPrice - a.productPrice);
         break;
       case "Giá: Thấp đến Cao":
-        sortedProducts.sort((a, b) => a.product_price - b.product_price);
+        sortedProducts.sort((a, b) => a.productPrice - b.productPrice);
         break;
       case "Mới nhất":
         sortedProducts.sort(
@@ -74,7 +72,7 @@ const SearchPage = () => {
         );
         break;
       case "Bán chạy":
-        sortedProducts.sort((a, b) => b.product_selled - a.product_selled);
+        sortedProducts.sort((a, b) => b.productSelled - a.productSelled);
         break;
       default:
         break;
@@ -173,10 +171,10 @@ const SearchPage = () => {
         {sortProducts
           .slice((currentPage - 1) * 12, currentPage * 12)
           .map((product) => (
-            <AnimationScroll key={product._id} type="fadeUp" delay={0.1}>
+            <AnimationScroll key={product.id} type="fadeUp" delay={0.1}>
               <ProductComponent
                 item={product}
-                onClick={() => navigate(`/product/${product._id}`)}
+                onClick={() => navigate(`/product/${product.id}`)}
               />
             </AnimationScroll>
           ))}

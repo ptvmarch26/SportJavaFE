@@ -1,14 +1,4 @@
-// import React from 'react'
 import { useNavigate } from "react-router-dom";
-// import running from "../../assets/images/running.jpg";
-// import gym from "../../assets/images/gym.jpg";
-// import tennis from "../../assets/images/tennis.jpg";
-// import soccer from "../../assets/images/soccer.jpg";
-// import basketball from "../../assets/images/basketball.jpg";
-// import CardComponent from "../../components/CardComponent/CardComponent";
-// import Slider from "react-slick";
-// import NextComponent from "../../components/NextComponent/NextComponent";
-// import BackComponent from "../../components/BackComponent/BackComponent";
 import { Carousel } from "@material-tailwind/react";
 import ProductComponent from "../../components/ProductComponent/ProductComponent";
 import AnimationScroll from "../../components/AnimationScroll/AnimationScroll";
@@ -20,6 +10,10 @@ import { getFavourite } from "../../services/api/FavouriteApi";
 import { useUser } from "../../context/UserContext";
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import { getDetailStore } from "../../services/api/StoreApi";
+import {
+  getRecommendedProducts,
+  getDetailsProduct,
+} from "../../services/api/ProductApi";
 
 const HomePage = () => {
   const storeId = import.meta.env.VITE_STORE_ID;
@@ -27,9 +21,10 @@ const HomePage = () => {
   const { products, fetchProducts } = useProduct();
   const [productFamous, setProductFamous] = useState([]);
   const [productSelled, setProductSelled] = useState([]);
-  const { fetchUser } = useUser();
+  const { fetchUser, selectedUser } = useUser();
   const [productNew, setProductNew] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
 
   const [favourites, setFavourites] = useState([]);
   const { token } = useAuth();
@@ -46,6 +41,18 @@ const HomePage = () => {
 
     fetchBanner();
   }, []);
+
+  useEffect(() => {
+    const fetchRecommendedDetails = async () => {
+      if (token && selectedUser?.id) {
+        const productDetails = await getRecommendedProducts(selectedUser.id);
+
+        setRecommendedProducts(productDetails.result);
+      }
+    };
+
+    fetchRecommendedDetails();
+  }, [selectedUser?.id]);
 
   const fetchFavourites = async () => {
     if (token) {
@@ -151,7 +158,33 @@ const HomePage = () => {
             </div>
           ))}
         </Carousel>
-
+        <div>
+          {recommendedProducts?.length > 0 && (
+            <div className="border-t-2 border-[rgba(0, 0, 0, 0.1)] w-full my-8">
+              <p className="uppercase text-4xl font-extrabold text-center my-8">
+                Có thể bạn sẽ thích
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {recommendedProducts
+                  ?.slice(0, productsToShow) 
+                  .map((product) => (
+                    <AnimationScroll
+                      key={product?.id}
+                      type="fadeUp"
+                      delay={0.1}
+                    >
+                      <ProductComponent
+                        item={product}
+                        favourites={favourites}
+                        onFavouriteChange={fetchFavourites}
+                        onClick={() => navigate(`/product/${product?.id}`)}
+                      />
+                    </AnimationScroll>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
         <div>
           {productsStatus?.map((productStatus, index) => {
             return (
