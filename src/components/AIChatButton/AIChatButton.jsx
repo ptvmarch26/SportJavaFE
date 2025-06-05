@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { FaRobot, FaTimes, FaArrowRight } from "react-icons/fa";
-import axios from "axios";
+import AxiosInstance from "../../services/api/AxiosInstance";
 import { useAuth } from "../../context/AuthContext";
 import { useUser } from "../../context/UserContext";
 
@@ -52,6 +52,7 @@ const CompactChatBot = ({ onClose }) => {
             text: msg.content,
             sender: msg.role === "assistant" ? "bot" : "user",
             timestamp: new Date(msg.timestamp).toLocaleString(),
+            products: Array.isArray(msg.suggestedProducts) ? msg.suggestedProducts : [],
           }));
           setMessages([
             {
@@ -108,24 +109,15 @@ const CompactChatBot = ({ onClose }) => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        `${URL}/openai/`,
-        {
-          message: input,
-          history: !token
-            ? newMessages.map((msg) => ({
-              role: msg.sender === "bot" ? "assistant" : "user",
-              content: msg.text,
-            }))
-            : undefined,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        }
-      );
+      const res = await AxiosInstance.post("/openai/", {
+        message: input,
+        history: !token
+          ? newMessages.map((msg) => ({
+            role: msg.sender === "bot" ? "assistant" : "user",
+            content: msg.text,
+          }))
+          : undefined,
+      });
 
 
       // Lấy message và products từ response mới
@@ -183,8 +175,8 @@ const CompactChatBot = ({ onClose }) => {
           >
             <div
               className={`p-2 rounded-lg max-w-xs ${message.sender === "user"
-                  ? "bg-[#171717] text-white text-right"
-                  : "bg-gray-200 text-black"
+                ? "bg-[#171717] text-white text-right"
+                : "bg-gray-200 text-black"
                 }`}
             >
               <div className="text-sm">{message.text}</div>
