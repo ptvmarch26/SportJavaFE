@@ -41,7 +41,7 @@ function MyAddress() {
 
   const handleSaveAddress = async () => {
     const errors = validateForm(editingAddress || {});
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors)?.length > 0) {
       setFormErrors(errors);
       return;
     }
@@ -58,7 +58,7 @@ function MyAddress() {
   const handleAddNewAddress = async () => {
     const newAddress = {
       ...editingAddress,
-      isDefault: addresses.length === 0, 
+      isDefault: addresses?.length === 0, 
     };
   
     await handleAddAddress(newAddress);
@@ -101,7 +101,7 @@ function MyAddress() {
 
     const updatedAddresses = addresses.filter((_, i) => i !== index);
 
-    if (isDefaultAddress && updatedAddresses.length > 0) {
+    if (isDefaultAddress && updatedAddresses?.length > 0) {
       updatedAddresses[0].isDefault = true;
     };
     

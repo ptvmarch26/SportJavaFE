@@ -54,8 +54,6 @@ const SearchPage = () => {
     setCurrentSort(sortOption);
     setSortText(sortOption);
     setSortOpen(false);
-
-    applySorting(sortOption, products);
   };
 
 
@@ -64,10 +62,10 @@ const SearchPage = () => {
 
     switch (sortOption) {
       case "Giá: Cao đến Thấp":
-        sortedProducts.sort((a, b) => b.product_price - a.product_price);
+        sortedProducts.sort((a, b) => b.productPrice - a.productPrice);
         break;
       case "Giá: Thấp đến Cao":
-        sortedProducts.sort((a, b) => a.product_price - b.product_price);
+        sortedProducts.sort((a, b) => a.productPrice - b.productPrice);
         break;
       case "Mới nhất":
         sortedProducts.sort(
@@ -75,7 +73,7 @@ const SearchPage = () => {
         );
         break;
       case "Bán chạy":
-        sortedProducts.sort((a, b) => b.product_selled - a.product_selled);
+        sortedProducts.sort((a, b) => b.productSelled - a.productSelled);
         break;
       default:
         break;
