@@ -77,7 +77,10 @@ const OrderStatusPage = () => {
               : order
           )
         );
-        if (result.result.orderPaymentMethod === "PAYPAL" && result.result.isPaid)
+        if (
+          result.result.orderPaymentMethod === "PAYPAL" &&
+          result.result.isPaid
+        )
           showPopup(result.EM);
         else showPopup("Hủy đơn hàng thành công");
       } else showPopup(result.EM, false);
@@ -207,9 +210,9 @@ const OrderStatusPage = () => {
                   >
                     {order.orderStatus === "HOAN_HANG"
                       ? "Đã hoàn tiền"
-                      : `${order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"} (${
-                          order.orderPaymentMethod
-                        })`}
+                      : `${
+                          order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"
+                        } (${order.orderPaymentMethod})`}
                   </span>
                 </p>
               </div>
@@ -266,7 +269,7 @@ const OrderStatusPage = () => {
               <div className="mt-4 text-right space-x-2">
                 {order.orderStatus === "HOAN_THANH" && (
                   <>
-                    {!order.isRequireRefund && (
+                    {!order.isRequireRefund && !order.isFeedback && (
                       <Button
                         variant="filled"
                         color="blue"
