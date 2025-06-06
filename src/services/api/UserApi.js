@@ -101,6 +101,7 @@ export const deleteSearch = async (index) => {
 export const getChatHistory = async () => {
   try {
     const response = await AxiosInstance.get("/user/get-chat-history");
+    console.log("getChatHistory response:", response);
     return response.data;
   } catch (error) {
     return error.response?.data || "Lỗi kết nối đến server";
