@@ -320,7 +320,7 @@ const OrderStatusPage = () => {
                   <Button
                     variant="filled"
                     color="black"
-                    className="w-[100px] h-[30px] sm:w-[150px] sm:h-[40px] rounded font-medium border transition duration-200 bg-yellow-100 text-yellow-700 border-yellow-400 hover:brightness-110"
+                    className="w-[150px] h-[30px] sm:w-[150px] sm:h-[40px] rounded font-medium border transition duration-200 bg-yellow-100 text-yellow-700 border-yellow-400 hover:brightness-110"
                     onClick={() => {
                       setSelectedOrder(order.id);
                       setOpenCancelRequireRefundDialog(true);
