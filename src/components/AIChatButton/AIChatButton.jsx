@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaRobot, FaTimes, FaArrowRight } from "react-icons/fa";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
@@ -35,6 +36,7 @@ const CompactChatBot = ({ onClose }) => {
       timestamp: new Date().toLocaleString(),
     },
   ]);
+  const navigate = useNavigate();
 
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -114,9 +116,9 @@ const CompactChatBot = ({ onClose }) => {
           message: input,
           history: !token
             ? newMessages.map((msg) => ({
-              role: msg.sender === "bot" ? "assistant" : "user",
-              content: msg.text,
-            }))
+                role: msg.sender === "bot" ? "assistant" : "user",
+                content: msg.text,
+              }))
             : undefined,
         },
         {
@@ -126,7 +128,6 @@ const CompactChatBot = ({ onClose }) => {
           },
         }
       );
-
 
       // Lấy message và products từ response mới
       const { message, products } = res.data.result || {};
@@ -155,7 +156,7 @@ const CompactChatBot = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed bottom-[56px] lg:bottom-0 right-2 z-[70] bg-white shadow-xl w-80 overflow-hidden border border-gray-200">
+    <div className="fixed bottom-[56px] lg:bottom-0 right-2 z-[70] bg-white shadow-xl w-100 overflow-hidden border border-gray-200">
       <div className="bg-primary text-white p-3 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <FaRobot />
@@ -178,14 +179,16 @@ const CompactChatBot = ({ onClose }) => {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"
-              } mb-2`}
+            className={`flex ${
+              message.sender === "user" ? "justify-end" : "justify-start"
+            } mb-2`}
           >
             <div
-              className={`p-2 rounded-lg max-w-xs ${message.sender === "user"
+              className={`p-2 rounded-lg max-w-xs ${
+                message.sender === "user"
                   ? "bg-[#171717] text-white text-right"
                   : "bg-gray-200 text-black"
-                }`}
+              }`}
             >
               <div className="text-sm">{message.text}</div>
 
@@ -204,14 +207,16 @@ const CompactChatBot = ({ onClose }) => {
                           className="w-12 h-12 rounded object-cover border"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium truncate">{prod.productTitle}</div>
+                          <div className="font-medium truncate">
+                            {prod.productTitle}
+                          </div>
                           <div className="text-xs text-gray-600">
                             {prod.productPrice?.toLocaleString()}đ
                           </div>
                         </div>
                         <button
                           className="px-2 py-1 text-xs bg-primary text-white rounded hover:bg-black"
-                          onClick={() => window.location.href = `/product/${prod.id}`}
+                          onClick={() => navigate(`/product/${prod.id}`)}
                         >
                           Xem
                         </button>
@@ -227,7 +232,6 @@ const CompactChatBot = ({ onClose }) => {
         )}
         <div ref={endOfMessagesRef} />
       </div>
-
 
       <div className="p-2 border-t">
         <div className="relative">
